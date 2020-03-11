@@ -11,8 +11,8 @@ export async function seed(knex: Knex): Promise<any> {
     .then(() => {
       return knex('users').insert([
         {
-          first_name: 'Aymen',
-          last_name: 'J',
+          firstName: 'Aymen',
+          lastName: 'J',
           email: 'aymen@gmail.com',
           password: 'test123',
           country: 'Ethiopia',
@@ -20,11 +20,11 @@ export async function seed(knex: Knex): Promise<any> {
           phone: '0923704406',
           language: 'English',
           ishost: true,
-          joined_date: new Date().toUTCString()
+          joinedDate: new Date().toUTCString()
         },
         {
-          first_name: 'Simret',
-          last_name: 'A',
+          firstName: 'Simret',
+          lastName: 'A',
           email: 'simret@gmail.com',
           password: 'test123',
           country: 'Ethiopia',
@@ -32,11 +32,11 @@ export async function seed(knex: Knex): Promise<any> {
           phone: '0923704406',
           language: 'English',
           ishost: true,
-          joined_date: new Date().toUTCString()
+          joinedDate: new Date().toUTCString()
         },
         {
-          first_name: 'Nahoo',
-          last_name: 'H',
+          firstName: 'Nahoo',
+          lastName: 'H',
           email: 'nahoo@gmail.com',
           password: 'test123',
           country: 'Ethiopia',
@@ -44,7 +44,7 @@ export async function seed(knex: Knex): Promise<any> {
           phone: '0923704406',
           language: 'English',
           ishost: true,
-          joined_date: new Date().toUTCString()
+          joinedDate: new Date().toUTCString()
         }
       ]);
     })
@@ -62,10 +62,10 @@ export async function seed(knex: Knex): Promise<any> {
               country: 'Ethiopia',
               bedrooms: 3,
               bathrooms: 2,
-              person_capacity: 6,
-              house_type: 'vila',
+              personCapacity: 6,
+              houseType: 'vila',
               rating: 3.5,
-              created_at: new Date().toUTCString()
+              createdAt: new Date().toUTCString()
             },
             {
               users_id: usersId[1],
@@ -76,10 +76,10 @@ export async function seed(knex: Knex): Promise<any> {
               country: 'Ethiopia',
               bedrooms: 3,
               bathrooms: 2,
-              person_capacity: 6,
-              house_type: 'vila',
+              personCapacity: 6,
+              houseType: 'vila',
               rating: 3.5,
-              created_at: new Date().toUTCString()
+              createdAt: new Date().toUTCString()
             },
             {
               users_id: usersId[2],
@@ -90,10 +90,10 @@ export async function seed(knex: Knex): Promise<any> {
               country: 'Ethiopia',
               bedrooms: 3,
               bathrooms: 2,
-              person_capacity: 6,
-              house_type: 'vila',
+              personCapacity: 6,
+              houseType: 'vila',
               rating: 3.5,
-              created_at: new Date().toUTCString()
+              createdAt: new Date().toUTCString()
             }
           ]);
         });

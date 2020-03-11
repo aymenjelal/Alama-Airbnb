@@ -1,5 +1,5 @@
 import express, { Router, Request, Response } from 'express';
-import { Listing } from '../../models/schema';
+import { Listing } from '../../models/knex_schema';
 
 var todoRouter: Router = express.Router();
 

@@ -63,7 +63,7 @@ export class OccupiedDate extends Model {
   }
 }
 
-export class Image extends Model {
+export class ListingImage extends Model {
   static get tableName(): string {
     return 'images';
   }
@@ -134,7 +134,7 @@ export class Listing extends Model {
       },
       images: {
         relation: Model.HasManyRelation,
-        modelClass: Image,
+        modelClass: ListingImage,
         join: {
           from: 'listings.id',
           to: 'images.listings_id'

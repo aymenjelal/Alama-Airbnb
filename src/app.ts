@@ -1,11 +1,25 @@
 import express, { Application, Request, Response } from 'express';
+import expressGraphQL from 'express-graphql';
+import { ApolloServer } from 'apollo-server-express';
+import { typeDefs } from './typeDefs';
+import { resolvers } from './resolvers';
+
 import apiRouter from './routes/api';
-require('dotenv').config();
+//require('dotenv').config();
 
 const app: Application = express();
 
-app.use('/api', apiRouter);
+//app.use('/api', apiRouter);
 
-console.log(process.env.DATABASE);
+const server = new ApolloServer({
+  typeDefs,
+  resolvers
+});
 
-app.listen(5000, () => console.log('server running'));
+server.applyMiddleware({ app });
+
+app.listen({ port: 4444 }, () => console.log('server ready at prot 400'));
+
+//console.log(process.env.DATABASE);
+
+//app.listen(5000, () => console.log('server running'));

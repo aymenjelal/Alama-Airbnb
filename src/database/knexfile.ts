@@ -1,14 +1,14 @@
 // Update with your config settings.
-require('ts-node/register');
-require('dotenv').config();
+//require('ts-node/register');
+//require('dotenv').config();
 
 module.exports = {
   client: 'pg',
   connection: {
-    host: process.env.HOST,
-    user: process.env.USER,
-    password: process.env.PASSWORD,
-    database: process.env.DATABASE
+    host: 'localhost',
+    user: 'postgres',
+    password: 'Welcome1',
+    database: 'airbnb_db'
   },
   pool: {
     min: 2,
