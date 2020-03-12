@@ -6,6 +6,11 @@ export const typeDefs = gql`
     users: [User]
   }
 
+  type listing {
+    id: String
+    name: String
+  }
+
   type User {
     id: String
     firstName: String
@@ -17,6 +22,7 @@ export const typeDefs = gql`
     language: String
     ishost: Boolean
     password: String
+    listings: [listing]
   }
 
   input UserInput {

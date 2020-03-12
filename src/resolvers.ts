@@ -33,7 +33,7 @@ const registerUser = async (user: NewUserType) => {
 };
 
 const getAllUsers = async () => {
-  const users = await User.query();
+  const users = await User.query().withGraphFetched('listings');
   return users;
 };
 export const resolvers: IResolvers = {
