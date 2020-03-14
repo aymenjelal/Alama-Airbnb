@@ -1,7 +1,7 @@
 import express, { Application, Request, Response } from 'express';
 import expressGraphQL from 'express-graphql';
 import { ApolloServer } from 'apollo-server-express';
-import { typeDefs } from './typeDefs';
+import { typeDefs } from './graphql/typeDefs';
 import { resolvers } from './resolvers';
 
 import apiRouter from './routes/api';
@@ -18,7 +18,7 @@ const server = new ApolloServer({
 
 server.applyMiddleware({ app });
 
-app.listen({ port: 4444 }, () => console.log('server ready at prot 400'));
+app.listen({ port: 4000 }, () => console.log('server ready at prot 400'));
 
 //console.log(process.env.DATABASE);
 

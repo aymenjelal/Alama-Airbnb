@@ -1,62 +1,68 @@
 import { IResolvers } from 'graphql-tools';
-import { User } from './models/User';
+import {
+  User,
+  NewUserType,
+  registerUser,
+  getAllUsers,
+  getUser,
+  UpdateUserType,
+  updateUser,
+  deleteUser
+} from './models/user';
 //require('dotenv').config();
 
-interface NewUserType {
-  firstName: string;
-  lastName: string;
-  email: string;
-  country: string;
-  street: string;
-  phone: string;
-  language: string;
-  ishost: boolean;
-  password: string;
-}
+// interface NewUserType {
+//   firstName: string;
+//   lastName: string;
+//   email: string;
+//   country: string;
+//   street: string;
+//   phone: string;
+//   language: string;
+//   ishost: boolean;
+//   password: string;
+// }
 
-const registerUser = async (user: NewUserType) => {
-  const registeredUser: User = await User.query().insert({
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    country: user.country,
-    street: user.street,
-    phone: user.phone,
-    language: user.language,
-    ishost: user.ishost,
-    password: user.password
-  });
+// const registerUser = async (user: NewUserType) => {
+//   const registeredUser: User = await User.query().insert({
+//     ...user
+//   });
 
-  console.log(registeredUser.id);
+//   return registeredUser;
+// };
 
-  return registeredUser;
-};
-
-const getAllUsers = async () => {
-  const users = await User.query().withGraphFetched('listings');
-  return users;
-};
+// const getAllUsers = async () => {
+//   const users = await User.query().withGraphFetched('listings');
+//   return users;
+// };
 export const resolvers: IResolvers = {
   Query: {
-    hello: () => 'hi',
-    users: async () => getAllUsers()
+    users: async () => getAllUsers(),
+    user: async (_, { id }) => getUser(id)
   },
 
   Mutation: {
     registerUsers: async (_, { input }) => {
       let newUser: NewUserType = {
-        firstName: input.firstName,
-        lastName: input.lastName,
-        email: input.email,
-        country: input.country,
-        street: input.street,
-        phone: input.street,
-        language: input.language,
-        ishost: input.ishost,
-        password: input.password
+        ...input
       };
       let registeredUser = await registerUser(newUser);
       return registeredUser;
+    },
+
+    updateUser: async (_, { input }) => {
+      let user: UpdateUserType = {
+        ...input
+      };
+      let updatedUser = await updateUser(user);
+      return updatedUser;
+    },
+
+    deleteUser: async (_, { input }) => {
+      let deletedUser = await deleteUser(input);
+      return {
+        deleted: deletedUser
+      };
     }
   }
 };
