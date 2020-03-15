@@ -17,7 +17,7 @@ server.applyMiddleware({ app });
 
 let port = process.env.port || 4000;
 
-app.listen({ port }, () => console.log(`server ready at port ${port}`));
+app.listen(port, () => console.log(`server ready at port ${port}`));
 
 //console.log(process.env.DATABASE);
 
