@@ -15,6 +15,6 @@ const server = new apollo_server_express_1.ApolloServer({
 });
 server.applyMiddleware({ app });
 let port = process.env.port || 4000;
-app.listen({ port }, () => console.log(`server ready at port ${port}`));
+app.listen(port, () => console.log(`server ready at port ${port}`));
 //console.log(process.env.DATABASE);
 //app.listen(5000, () => console.log('server running'));
