@@ -1,6 +1,9 @@
 import { Model } from 'objection';
 import { Listing } from './listing';
 import { User } from './user';
+import { db } from '../database/db';
+
+Model.knex(db);
 
 export class Review extends Model {
   static get tableName(): string {

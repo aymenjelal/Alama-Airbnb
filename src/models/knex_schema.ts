@@ -1,10 +1,9 @@
 import Knex from 'knex';
 const connection = require('../database/knexfile');
 import { Model } from 'objection';
+import { db } from '../database/db';
 
-const knexConnection = Knex(connection);
-
-Model.knex(knexConnection);
+Model.knex(db);
 
 export class Geolocation extends Model {
   static get tableName(): string {

@@ -6,6 +6,9 @@ import { Review } from './review';
 import { ListingImage } from './image';
 import { Anemity } from './anemity';
 import { Geolocation } from './geolocation';
+import { db } from '../database/db';
+
+Model.knex(db);
 
 export class Listing extends Model {
   id!: string;
@@ -23,6 +26,7 @@ export class Listing extends Model {
   geolocations!: Geolocation[];
   images!: ListingImage[];
   anemitys!: Anemity[];
+  createdAt!: Date;
 
   static get tableName(): string {
     return 'listings';
@@ -110,6 +114,7 @@ export interface NewListingType {
   geolocations: NewGeolocationType[];
   images: NewImageType[];
   anemitys: NewAnemityType[];
+  createdAt: Date;
 }
 
 export const getAllListings = async (): Promise<Listing[]> => {
@@ -129,6 +134,7 @@ export const getListing = async (listingId: string): Promise<Listing> => {
 };
 
 export const addListing = async (listing: NewListingType): Promise<Listing> => {
+  listing.createdAt = new Date();
   const newListing: Listing = await Listing.query().insertGraph(
     {
       ...listing

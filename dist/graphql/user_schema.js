@@ -1,7 +1,6 @@
-import { gql } from 'apollo-server-express';
-import { GraphQLDate, GraphQLTime, GraphQLDateTime } from 'graphql-iso-date';
-
-export const types = `
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.types = `
   type User {
     id: String
     firstName: String
@@ -21,8 +20,7 @@ export const types = `
     deleted: Int
   }
 `;
-
-export const inputs = `
+exports.inputs = `
     input NewUserInput {
         firstName: String
         lastName: String
@@ -48,13 +46,11 @@ export const inputs = `
       password: String
   }
 `;
-
-export const queries = `
+exports.queries = `
     users: [User]
     user(id: String): User
 `;
-
-export const mutations = `
+exports.mutations = `
     registerUsers(input: NewUserInput): User!
     updateUser(input: UpdateUserInput): User!
     deleteUser(input: String): deletedNumber!

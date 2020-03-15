@@ -3,8 +3,9 @@ const connection = require('../database/knexfile');
 import { Model } from 'objection';
 import { Listing, Review } from './knex_schema';
 import { gql } from 'apollo-server-express';
+import { db } from '../database/db';
 
-const knexConnection = Knex(connection);
+Model.knex(db);
 export class User extends Model {
   id!: string;
   firstName!: string;
@@ -16,6 +17,7 @@ export class User extends Model {
   language!: string;
   ishost!: boolean;
   password!: string;
+  joinedDate!: Date;
 
   static get tableName(): string {
     return 'users';
@@ -53,6 +55,7 @@ export interface NewUserType {
   language: string;
   ishost: boolean;
   password: string;
+  joinedDate: Date;
 }
 
 export interface UpdateUserType {
@@ -69,6 +72,7 @@ export interface UpdateUserType {
 }
 
 export const registerUser = async (user: NewUserType): Promise<User> => {
+  user.joinedDate = new Date();
   const registeredUser: User = await User.query().insert({
     ...user
   });

@@ -1,5 +1,8 @@
 import { Model } from 'objection';
 import { Listing } from './listing';
+import { db } from '../database/db';
+
+Model.knex(db);
 
 export class ListingImage extends Model {
   id!: string;

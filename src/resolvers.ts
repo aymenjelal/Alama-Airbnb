@@ -17,6 +17,7 @@ import {
   updateListing,
   Listing
 } from './models/listing';
+import { GraphQLScalarType, Kind } from 'graphql';
 //require('dotenv').config();
 
 // interface NewUserType {
@@ -50,6 +51,23 @@ export const resolvers: IResolvers = {
     listings: async () => getAllListings(),
     listing: async (_, { id }) => getListing(id)
   },
+
+  Date: new GraphQLScalarType({
+    name: 'Date',
+    description: 'Date custom scalar type',
+    parseValue(value) {
+      return new Date(value); // value from the client
+    },
+    serialize(value) {
+      return value.getTime(); // value sent to the client
+    },
+    parseLiteral(ast) {
+      if (ast.kind === Kind.INT) {
+        return parseInt(ast.value, 10); // ast value is always in string format
+      }
+      return null;
+    }
+  }),
 
   Mutation: {
     registerUsers: async (_, { input }) => {

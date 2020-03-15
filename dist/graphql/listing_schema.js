@@ -1,6 +1,6 @@
-import { gql } from 'apollo-server-express';
-
-export const types = `
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.types = `
   type Listing {
     id: String
     name: String
@@ -20,8 +20,7 @@ export const types = `
     createdAt: Date
   }
 `;
-
-export const inputs = `
+exports.inputs = `
 
   input NewImageInput{
     url: String
@@ -92,13 +91,11 @@ export const inputs = `
   }
   
 `;
-
-export const queries = `
+exports.queries = `
   listings: [Listing]
   listing(id: String): Listing 
 `;
-
-export const mutations = `
+exports.mutations = `
 
   addNewListing(input: NewListingInput): Listing!
   updateListing(input: UpdateListingInput): Listing!

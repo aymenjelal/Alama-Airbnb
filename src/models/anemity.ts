@@ -1,5 +1,8 @@
 import { Model } from 'objection';
 import { Listing } from './listing';
+import { db } from '../database/db';
+
+Model.knex(db);
 
 export class Anemity extends Model {
   id!: string;

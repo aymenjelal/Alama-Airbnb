@@ -1,4 +1,5 @@
 import { gql } from 'apollo-server-express';
+import { GraphQLDate, GraphQLTime, GraphQLDateTime } from 'graphql-iso-date';
 import * as User from './user_schema';
 import * as Listing from './listing_schema';
 import * as Review from './review_schema';
@@ -22,6 +23,8 @@ schemas.forEach(s => {
   mutations.push(s.mutations);
 });
 export const typeDefs = gql`
+
+  scalar Date
 
   ${types.join('\n')}
   ${inputs.join('\n')}

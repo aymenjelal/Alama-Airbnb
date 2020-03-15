@@ -4,9 +4,6 @@ import { ApolloServer } from 'apollo-server-express';
 import { typeDefs } from './graphql/typeDefs';
 import { resolvers } from './resolvers';
 
-import apiRouter from './routes/api';
-//require('dotenv').config();
-
 const app: Application = express();
 
 //app.use('/api', apiRouter);
@@ -18,7 +15,9 @@ const server = new ApolloServer({
 
 server.applyMiddleware({ app });
 
-app.listen({ port: 4000 }, () => console.log('server ready at prot 400'));
+let port = process.env.port || 4000;
+
+app.listen({ port }, () => console.log(`server ready at port ${port}`));
 
 //console.log(process.env.DATABASE);
 
