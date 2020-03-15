@@ -6,6 +6,7 @@ import { gql } from 'apollo-server-express';
 import { db } from '../database/db';
 
 Model.knex(db);
+
 export class User extends Model {
   id!: string;
   firstName!: string;
