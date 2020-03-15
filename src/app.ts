@@ -15,7 +15,7 @@ const server = new ApolloServer({
 
 server.applyMiddleware({ app });
 
-app.listen(process.env.port || 4000, () => console.log(`server ready `));
+app.listen(process.env.PORT || 4000, () => console.log(`server ready `));
 
 //console.log(process.env.DATABASE);
 
