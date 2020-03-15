@@ -12,7 +12,7 @@ export const types = `
     language: String
     ishost: Boolean
     password: String
-    listings: [listing]
+    listings: [Listing]
   }
 
   type deletedNumber{

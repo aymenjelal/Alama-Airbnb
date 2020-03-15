@@ -1,8 +1,9 @@
 export const types = `
 
-    type Review{
+    type Geolocation{
         id: String
-        content: String
+        lat: Float
+        long: Float
         
     }
 `;

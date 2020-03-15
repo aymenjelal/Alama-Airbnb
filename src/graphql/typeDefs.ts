@@ -1,6 +1,11 @@
 import { gql } from 'apollo-server-express';
 import * as User from './user_schema';
 import * as Listing from './listing_schema';
+import * as Review from './review_schema';
+import * as Anemity from './anemity_schema';
+import * as Geolocation from './geolocation_schema';
+import * as Image from './image_schema';
+
 import { DocumentNode } from 'graphql';
 
 const types: string[] = [];
@@ -8,7 +13,7 @@ const queries: string[] = [];
 const inputs: string[] = [];
 const mutations: string[] = [];
 
-const schemas = [User, Listing];
+const schemas = [User, Listing, Review, Image, Geolocation, Anemity];
 
 schemas.forEach(s => {
   types.push(s.types);

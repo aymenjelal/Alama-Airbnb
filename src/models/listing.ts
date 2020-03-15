@@ -1,15 +1,29 @@
 import { Model } from 'objection';
 import { User } from './user';
-import {
-  Review,
-  ListingImage,
-  OccupiedDate,
-  Anemity,
-  Geolocation
-} from './knex_schema';
+import { OccupiedDate } from './knex_schema';
 import { gql } from 'apollo-server-express';
+import { Review } from './review';
+import { ListingImage } from './image';
+import { Anemity } from './anemity';
+import { Geolocation } from './geolocation';
 
 export class Listing extends Model {
+  id!: string;
+  name!: string;
+  price!: number;
+  street!: string;
+  city!: string;
+  country!: string;
+  bedrooms!: number;
+  bathrooms!: number;
+  personCapacity!: number;
+  houseType!: string;
+  rating!: number;
+  user!: User;
+  geolocations!: Geolocation[];
+  images!: ListingImage[];
+  anemitys!: Anemity[];
+
   static get tableName(): string {
     return 'listings';
   }
@@ -68,9 +82,74 @@ export class Listing extends Model {
   }
 }
 
-export const typeDef = gql`
-  type listing {
-    id: String
-    name: String
-  }
-`;
+interface NewGeolocationType {
+  lat: number;
+  long: number;
+}
+
+interface NewImageType {
+  url: string;
+}
+
+interface NewAnemityType {
+  name: string;
+}
+
+export interface NewListingType {
+  name: string;
+  price: number;
+  street: string;
+  city: string;
+  country: string;
+  bedrooms: number;
+  bathrooms: number;
+  personCapacity: number;
+  houseType: string;
+  rating: number;
+  user: User;
+  geolocations: NewGeolocationType[];
+  images: NewImageType[];
+  anemitys: NewAnemityType[];
+}
+
+export const getAllListings = async (): Promise<Listing[]> => {
+  const listings: Listing[] = await Listing.query().withGraphFetched('reviews');
+  return listings;
+};
+
+export const getListing = async (listingId: string): Promise<Listing> => {
+  const listing: Listing = await Listing.query()
+    .findById(listingId)
+    .withGraphFetched('reviews')
+    .withGraphFetched('images')
+    .withGraphFetched('geolocations')
+    .withGraphFetched('anemitys');
+
+  return listing;
+};
+
+export const addListing = async (listing: NewListingType): Promise<Listing> => {
+  const newListing: Listing = await Listing.query().insertGraph(
+    {
+      ...listing
+    },
+    {
+      relate: true
+    }
+  );
+
+  return newListing;
+};
+
+export const updateListing = async (listing: Listing): Promise<Listing> => {
+  const updatedListing: Listing = await Listing.query().upsertGraphAndFetch(
+    {
+      ...listing
+    },
+    {
+      relate: true
+    }
+  );
+
+  return updatedListing;
+};

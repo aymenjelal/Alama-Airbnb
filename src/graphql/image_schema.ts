@@ -1,8 +1,8 @@
 export const types = `
 
-    type Review{
+    type Image{
         id: String
-        content: String
+        url: String
         
     }
 `;

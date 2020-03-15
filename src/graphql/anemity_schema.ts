@@ -1,8 +1,8 @@
 export const types = `
 
-    type Review{
+    type Anemity{
         id: String
-        content: String
+        name: String
         
     }
 `;

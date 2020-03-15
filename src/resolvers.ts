@@ -9,6 +9,14 @@ import {
   updateUser,
   deleteUser
 } from './models/user';
+import {
+  getAllListings,
+  getListing,
+  addListing,
+  NewListingType,
+  updateListing,
+  Listing
+} from './models/listing';
 //require('dotenv').config();
 
 // interface NewUserType {
@@ -38,7 +46,9 @@ import {
 export const resolvers: IResolvers = {
   Query: {
     users: async () => getAllUsers(),
-    user: async (_, { id }) => getUser(id)
+    user: async (_, { id }) => getUser(id),
+    listings: async () => getAllListings(),
+    listing: async (_, { id }) => getListing(id)
   },
 
   Mutation: {
@@ -63,6 +73,24 @@ export const resolvers: IResolvers = {
       return {
         deleted: deletedUser
       };
+    },
+
+    addNewListing: async (_, { input }) => {
+      let listing: NewListingType = {
+        ...input
+      };
+      let newListing = await addListing(listing);
+      return newListing;
+    },
+
+    updateListing: async (_, { input }) => {
+      let listing: Listing = {
+        ...input
+      };
+
+      let updatedListing = await updateListing(listing);
+
+      return updatedListing;
     }
   }
 };
