@@ -11,9 +11,11 @@ const app = express_1.default();
 //app.use('/api', apiRouter);
 const server = new apollo_server_express_1.ApolloServer({
     typeDefs: typeDefs_1.typeDefs,
-    resolvers: resolvers_1.resolvers
+    resolvers: resolvers_1.resolvers,
+    introspection: true,
+    playground: true
 });
 server.applyMiddleware({ app });
-app.listen(process.env.port || 4000, () => console.log(`server ready `));
+app.listen(process.env.PORT || 4000, () => console.log(`server ready `));
 //console.log(process.env.DATABASE);
 //app.listen(5000, () => console.log('server running'));
