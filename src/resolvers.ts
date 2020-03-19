@@ -18,6 +18,14 @@ import {
   Listing
 } from './models/listing';
 import { GraphQLScalarType, Kind } from 'graphql';
+import {
+  getReviewbyListing,
+  ReviewType,
+  addNewReview,
+  updateReview,
+  Review,
+  deleteReview
+} from './models/review';
 //require('dotenv').config();
 
 // interface NewUserType {
@@ -49,7 +57,8 @@ export const resolvers: IResolvers = {
     users: async () => getAllUsers(),
     user: async (_, { id }) => getUser(id),
     listings: async () => getAllListings(),
-    listing: async (_, { id }) => getListing(id)
+    listing: async (_, { id }) => getListing(id),
+    reviewByListing: async (_, { id }) => getReviewbyListing(id)
   },
 
   Date: new GraphQLScalarType({
@@ -87,7 +96,7 @@ export const resolvers: IResolvers = {
     },
 
     deleteUser: async (_, { input }) => {
-      let deletedUser = await deleteUser(input);
+      let deletedUser: Number = await deleteUser(input);
       return {
         deleted: deletedUser
       };
@@ -109,6 +118,31 @@ export const resolvers: IResolvers = {
       let updatedListing = await updateListing(listing);
 
       return updatedListing;
+    },
+
+    addReview: async (_, { input }) => {
+      let review: ReviewType = {
+        ...input
+      };
+
+      let newReview = await addNewReview(review);
+
+      return newReview;
+    },
+
+    updateReview: async (_, { input }) => {
+      let review: Review = {
+        ...input
+      };
+
+      let updatedReview = await updateReview(review);
+
+      return updatedReview;
+    },
+
+    deleteReview: async (_, { input }) => {
+      let deletedReview: Number = await deleteReview(input);
+      return deletedReview;
     }
   }
 };
