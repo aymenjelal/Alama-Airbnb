@@ -20,6 +20,12 @@ export const types = `
   type deletedNumber{
     deleted: Int
   }
+
+  type AuthData{
+    userId: String!
+    token: String!
+    tokenExpiration: Int!
+  }
 `;
 
 export const inputs = `
@@ -52,6 +58,7 @@ export const inputs = `
 export const queries = `
     users: [User]
     user(id: String): User
+    login(email:String!, password: String!): AuthData!
 `;
 
 export const mutations = `

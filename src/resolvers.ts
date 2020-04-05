@@ -7,7 +7,8 @@ import {
   getUser,
   UpdateUserType,
   updateUser,
-  deleteUser
+  deleteUser,
+  loginUser
 } from './models/user';
 import {
   getAllListings,
@@ -26,6 +27,7 @@ import {
   Review,
   deleteReview
 } from './models/review';
+import { Request } from 'express';
 //require('dotenv').config();
 
 // interface NewUserType {
@@ -56,6 +58,7 @@ export const resolvers: IResolvers = {
   Query: {
     users: async () => getAllUsers(),
     user: async (_, { id }) => getUser(id),
+    login: async (_, { email, password }) => loginUser(email, password),
     listings: async () => getAllListings(),
     listing: async (_, { id }) => getListing(id),
     reviewByListing: async (_, { id }) => getReviewbyListing(id)
@@ -87,7 +90,10 @@ export const resolvers: IResolvers = {
       return registeredUser;
     },
 
-    updateUser: async (_, { input }) => {
+    updateUser: async (_, { input }, context) => {
+      if (!context.req.isAuth) {
+        throw new Error('Unauthenticated!!');
+      }
       let user: UpdateUserType = {
         ...input
       };
@@ -95,14 +101,21 @@ export const resolvers: IResolvers = {
       return updatedUser;
     },
 
-    deleteUser: async (_, { input }) => {
+    deleteUser: async (_, { input }, context) => {
+      if (!context.req.isAuth) {
+        throw new Error('Unauthenticated!!');
+      }
       let deletedUser: Number = await deleteUser(input);
       return {
         deleted: deletedUser
       };
     },
 
-    addNewListing: async (_, { input }) => {
+    addNewListing: async (_, { input }, context) => {
+      if (!context.req.isAuth) {
+        throw new Error('Unauthenticated!!');
+      }
+
       let listing: NewListingType = {
         ...input
       };
@@ -110,7 +123,10 @@ export const resolvers: IResolvers = {
       return newListing;
     },
 
-    updateListing: async (_, { input }) => {
+    updateListing: async (_, { input }, context) => {
+      if (!context.req.isAuth) {
+        throw new Error('Unauthenticated!!');
+      }
       let listing: Listing = {
         ...input
       };
@@ -120,7 +136,10 @@ export const resolvers: IResolvers = {
       return updatedListing;
     },
 
-    addReview: async (_, { input }) => {
+    addReview: async (_, { input }, context) => {
+      if (!context.req.isAuth) {
+        throw new Error('Unauthenticated!!');
+      }
       let review: ReviewType = {
         ...input
       };
@@ -130,7 +149,10 @@ export const resolvers: IResolvers = {
       return newReview;
     },
 
-    updateReview: async (_, { input }) => {
+    updateReview: async (_, { input }, context) => {
+      if (!context.req.isAuth) {
+        throw new Error('Unauthenticated!!');
+      }
       let review: Review = {
         ...input
       };
@@ -140,7 +162,10 @@ export const resolvers: IResolvers = {
       return updatedReview;
     },
 
-    deleteReview: async (_, { input }) => {
+    deleteReview: async (_, { input }, context) => {
+      if (!context.req.isAuth) {
+        throw new Error('Unauthenticated!!');
+      }
       let deletedReview: Number = await deleteReview(input);
       return deletedReview;
     }

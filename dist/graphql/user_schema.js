@@ -19,6 +19,12 @@ exports.types = `
   type deletedNumber{
     deleted: Int
   }
+
+  type AuthData{
+    userId: String!
+    token: String!
+    tokenExpiration: Int!
+  }
 `;
 exports.inputs = `
     input NewUserInput {
@@ -49,6 +55,7 @@ exports.inputs = `
 exports.queries = `
     users: [User]
     user(id: String): User
+    login(email:String!, password: String!): AuthData!
 `;
 exports.mutations = `
     registerUsers(input: NewUserInput): User!

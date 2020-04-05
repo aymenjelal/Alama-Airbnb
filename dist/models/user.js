@@ -8,11 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const connection = require('../database/knexfile');
 const objection_1 = require("objection");
 const knex_schema_1 = require("./knex_schema");
 const db_1 = require("../database/db");
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 objection_1.Model.knex(db_1.db);
 class User extends objection_1.Model {
     static get tableName() {
@@ -41,7 +46,14 @@ class User extends objection_1.Model {
 }
 exports.User = User;
 exports.registerUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
+    const existingUser = yield User.query().findOne({ email: user.email });
+    if (existingUser) {
+        throw new Error('user already exists');
+    }
     user.joinedDate = new Date();
+    const passwordInput = user.password;
+    const hashedPassword = yield bcryptjs_1.default.hash(passwordInput, 12);
+    user.password = hashedPassword;
     const registeredUser = yield User.query().insert(Object.assign({}, user));
     return registeredUser;
 });
@@ -60,4 +72,22 @@ exports.updateUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
 exports.deleteUser = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     const deletedUser = yield User.query().deleteById(userId);
     return deletedUser;
+});
+exports.loginUser = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield User.query().findOne({ email: email });
+    if (!user) {
+        throw new Error('user doesnt exist');
+    }
+    const passEqual = yield bcryptjs_1.default.compare(password, user.password);
+    if (!passEqual) {
+        throw new Error('user doesnt exist');
+    }
+    const token = jsonwebtoken_1.default.sign({ userId: user.id }, 'sercretkeyalamabnb', {
+        expiresIn: '1h'
+    });
+    return {
+        userId: user.id,
+        token: token,
+        tokenExpiration: 1
+    };
 });

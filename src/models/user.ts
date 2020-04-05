@@ -4,6 +4,8 @@ import { Model } from 'objection';
 import { Listing, Review } from './knex_schema';
 import { gql } from 'apollo-server-express';
 import { db } from '../database/db';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 Model.knex(db);
 
@@ -72,8 +74,21 @@ export interface UpdateUserType {
   password: string;
 }
 
+export interface AuthDataType {
+  userId: string;
+  token: string;
+  tokenExpiration: number;
+}
+
 export const registerUser = async (user: NewUserType): Promise<User> => {
+  const existingUser: User = await User.query().findOne({ email: user.email });
+  if (existingUser) {
+    throw new Error('user already exists');
+  }
   user.joinedDate = new Date();
+  const passwordInput = user.password;
+  const hashedPassword = await bcrypt.hash(passwordInput, 12);
+  user.password = hashedPassword;
   const registeredUser: User = await User.query().insert({
     ...user
   });
@@ -102,4 +117,28 @@ export const updateUser = async (user: UpdateUserType): Promise<User> => {
 export const deleteUser = async (userId: string): Promise<Number> => {
   const deletedUser: number = await User.query().deleteById(userId);
   return deletedUser;
+};
+
+export const loginUser = async (
+  email: string,
+  password: string
+): Promise<AuthDataType> => {
+  const user: User = await User.query().findOne({ email: email });
+  if (!user) {
+    throw new Error('user doesnt exist');
+  }
+
+  const passEqual = await bcrypt.compare(password, user.password);
+  if (!passEqual) {
+    throw new Error('user doesnt exist');
+  }
+
+  const token = jwt.sign({ userId: user.id }, 'sercretkeyalamabnb', {
+    expiresIn: '1h'
+  });
+  return {
+    userId: user.id,
+    token: token,
+    tokenExpiration: 1
+  };
 };

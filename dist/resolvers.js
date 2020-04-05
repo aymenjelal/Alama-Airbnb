@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const user_1 = require("./models/user");
 const listing_1 = require("./models/listing");
 const graphql_1 = require("graphql");
+const review_1 = require("./models/review");
 //require('dotenv').config();
 // interface NewUserType {
 //   firstName: string;
@@ -38,8 +39,10 @@ exports.resolvers = {
     Query: {
         users: () => __awaiter(void 0, void 0, void 0, function* () { return user_1.getAllUsers(); }),
         user: (_, { id }) => __awaiter(void 0, void 0, void 0, function* () { return user_1.getUser(id); }),
+        login: (_, { email, password }) => __awaiter(void 0, void 0, void 0, function* () { return user_1.loginUser(email, password); }),
         listings: () => __awaiter(void 0, void 0, void 0, function* () { return listing_1.getAllListings(); }),
-        listing: (_, { id }) => __awaiter(void 0, void 0, void 0, function* () { return listing_1.getListing(id); })
+        listing: (_, { id }) => __awaiter(void 0, void 0, void 0, function* () { return listing_1.getListing(id); }),
+        reviewByListing: (_, { id }) => __awaiter(void 0, void 0, void 0, function* () { return review_1.getReviewbyListing(id); })
     },
     Date: new graphql_1.GraphQLScalarType({
         name: 'Date',
@@ -63,26 +66,61 @@ exports.resolvers = {
             let registeredUser = yield user_1.registerUser(newUser);
             return registeredUser;
         }),
-        updateUser: (_, { input }) => __awaiter(void 0, void 0, void 0, function* () {
+        updateUser: (_, { input }, context) => __awaiter(void 0, void 0, void 0, function* () {
+            if (!context.req.isAuth) {
+                throw new Error('Unauthenticated!!');
+            }
             let user = Object.assign({}, input);
             let updatedUser = yield user_1.updateUser(user);
             return updatedUser;
         }),
-        deleteUser: (_, { input }) => __awaiter(void 0, void 0, void 0, function* () {
+        deleteUser: (_, { input }, context) => __awaiter(void 0, void 0, void 0, function* () {
+            if (!context.req.isAuth) {
+                throw new Error('Unauthenticated!!');
+            }
             let deletedUser = yield user_1.deleteUser(input);
             return {
                 deleted: deletedUser
             };
         }),
-        addNewListing: (_, { input }) => __awaiter(void 0, void 0, void 0, function* () {
+        addNewListing: (_, { input }, context) => __awaiter(void 0, void 0, void 0, function* () {
+            if (!context.req.isAuth) {
+                throw new Error('Unauthenticated!!');
+            }
             let listing = Object.assign({}, input);
             let newListing = yield listing_1.addListing(listing);
             return newListing;
         }),
-        updateListing: (_, { input }) => __awaiter(void 0, void 0, void 0, function* () {
+        updateListing: (_, { input }, context) => __awaiter(void 0, void 0, void 0, function* () {
+            if (!context.req.isAuth) {
+                throw new Error('Unauthenticated!!');
+            }
             let listing = Object.assign({}, input);
             let updatedListing = yield listing_1.updateListing(listing);
             return updatedListing;
+        }),
+        addReview: (_, { input }, context) => __awaiter(void 0, void 0, void 0, function* () {
+            if (!context.req.isAuth) {
+                throw new Error('Unauthenticated!!');
+            }
+            let review = Object.assign({}, input);
+            let newReview = yield review_1.addNewReview(review);
+            return newReview;
+        }),
+        updateReview: (_, { input }, context) => __awaiter(void 0, void 0, void 0, function* () {
+            if (!context.req.isAuth) {
+                throw new Error('Unauthenticated!!');
+            }
+            let review = Object.assign({}, input);
+            let updatedReview = yield review_1.updateReview(review);
+            return updatedReview;
+        }),
+        deleteReview: (_, { input }, context) => __awaiter(void 0, void 0, void 0, function* () {
+            if (!context.req.isAuth) {
+                throw new Error('Unauthenticated!!');
+            }
+            let deletedReview = yield review_1.deleteReview(input);
+            return deletedReview;
         })
     }
 };
