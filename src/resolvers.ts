@@ -27,7 +27,15 @@ import {
   Review,
   deleteReview
 } from './models/review';
+import {
+  getBookingByListing,
+  getBookingByUser,
+  Booking,
+  addNewBooking,
+  BookingType
+} from './models/booking';
 import { Request } from 'express';
+import { val } from 'objection';
 //require('dotenv').config();
 
 // interface NewUserType {
@@ -61,21 +69,29 @@ export const resolvers: IResolvers = {
     login: async (_, { email, password }) => loginUser(email, password),
     listings: async () => getAllListings(),
     listing: async (_, { id }) => getListing(id),
-    reviewByListing: async (_, { id }) => getReviewbyListing(id)
+    reviewByListing: async (_, { id }) => getReviewbyListing(id),
+    bookingByListing: async (_, { id }) => getBookingByListing(id),
+    bookingByUser: async (_, { id }) => getBookingByUser(id)
   },
 
   Date: new GraphQLScalarType({
     name: 'Date',
     description: 'Date custom scalar type',
+
     parseValue(value) {
+      console.log(value);
       return new Date(value); // value from the client
     },
     serialize(value) {
-      return value.getTime(); // value sent to the client
+      console.log(value);
+      let sendValue = new Date(value);
+      return sendValue.getTime(); // value sent to the client
     },
     parseLiteral(ast) {
       if (ast.kind === Kind.INT) {
         return parseInt(ast.value, 10); // ast value is always in string format
+      } else if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
       return null;
     }
@@ -168,6 +184,21 @@ export const resolvers: IResolvers = {
       }
       let deletedReview: Number = await deleteReview(input);
       return deletedReview;
+    },
+
+    addBooking: async (_, { input }, context) => {
+      //console.log(input.startBookDate);
+      if (context.req.isAuth) {
+        throw new Error('Unauthenticated!!');
+      }
+
+      let booking: BookingType = {
+        ...input
+      };
+
+      let newBooking = await addNewBooking(booking);
+
+      return newBooking;
     }
   }
 };

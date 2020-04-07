@@ -12,7 +12,6 @@ export const types = `
     phone: String
     language: String
     ishost: Boolean
-    password: String
     joinedDate: Date
     listings: [Listing]
   }

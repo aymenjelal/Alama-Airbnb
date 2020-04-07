@@ -7,6 +7,7 @@ import { ListingImage } from './image';
 import { Anemity } from './anemity';
 import { Geolocation } from './geolocation';
 import { db } from '../database/db';
+import { Booking } from './booking';
 
 Model.knex(db);
 
@@ -26,6 +27,7 @@ export class Listing extends Model {
   geolocations!: Geolocation[];
   images!: ListingImage[];
   anemitys!: Anemity[];
+  bookings!: Booking[];
   createdAt!: Date;
 
   static get tableName(): string {
@@ -40,6 +42,14 @@ export class Listing extends Model {
         join: {
           from: 'listings.users_id',
           to: 'users.id'
+        }
+      },
+      bookings: {
+        relation: Model.HasManyRelation,
+        modelClass: Booking,
+        join: {
+          from: 'listings.id',
+          to: 'bookings.listings_id'
         }
       },
       reviews: {
@@ -118,7 +128,12 @@ export interface NewListingType {
 }
 
 export const getAllListings = async (): Promise<Listing[]> => {
-  const listings: Listing[] = await Listing.query().withGraphFetched('reviews');
+  const listings: Listing[] = await Listing.query()
+    .withGraphFetched('reviews')
+    .withGraphFetched('images')
+    .withGraphFetched('geolocations')
+    .withGraphFetched('anemitys')
+    .withGraphFetched('bookings');
   return listings;
 };
 
@@ -128,7 +143,8 @@ export const getListing = async (listingId: string): Promise<Listing> => {
     .withGraphFetched('reviews')
     .withGraphFetched('images')
     .withGraphFetched('geolocations')
-    .withGraphFetched('anemitys');
+    .withGraphFetched('anemitys')
+    .withGraphFetched('bookings');
 
   return listing;
 };
