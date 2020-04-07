@@ -13,6 +13,7 @@ const user_1 = require("./models/user");
 const listing_1 = require("./models/listing");
 const graphql_1 = require("graphql");
 const review_1 = require("./models/review");
+const booking_1 = require("./models/booking");
 //require('dotenv').config();
 // interface NewUserType {
 //   firstName: string;
@@ -42,20 +43,28 @@ exports.resolvers = {
         login: (_, { email, password }) => __awaiter(void 0, void 0, void 0, function* () { return user_1.loginUser(email, password); }),
         listings: () => __awaiter(void 0, void 0, void 0, function* () { return listing_1.getAllListings(); }),
         listing: (_, { id }) => __awaiter(void 0, void 0, void 0, function* () { return listing_1.getListing(id); }),
-        reviewByListing: (_, { id }) => __awaiter(void 0, void 0, void 0, function* () { return review_1.getReviewbyListing(id); })
+        reviewByListing: (_, { id }) => __awaiter(void 0, void 0, void 0, function* () { return review_1.getReviewbyListing(id); }),
+        bookingByListing: (_, { id }) => __awaiter(void 0, void 0, void 0, function* () { return booking_1.getBookingByListing(id); }),
+        bookingByUser: (_, { id }) => __awaiter(void 0, void 0, void 0, function* () { return booking_1.getBookingByUser(id); })
     },
     Date: new graphql_1.GraphQLScalarType({
         name: 'Date',
         description: 'Date custom scalar type',
         parseValue(value) {
+            console.log(value);
             return new Date(value); // value from the client
         },
         serialize(value) {
-            return value.getTime(); // value sent to the client
+            console.log(value);
+            let sendValue = new Date(value);
+            return sendValue.getTime(); // value sent to the client
         },
         parseLiteral(ast) {
             if (ast.kind === graphql_1.Kind.INT) {
                 return parseInt(ast.value, 10); // ast value is always in string format
+            }
+            else if (ast.kind === graphql_1.Kind.STRING) {
+                return ast.value;
             }
             return null;
         }
@@ -121,6 +130,15 @@ exports.resolvers = {
             }
             let deletedReview = yield review_1.deleteReview(input);
             return deletedReview;
+        }),
+        addBooking: (_, { input }, context) => __awaiter(void 0, void 0, void 0, function* () {
+            //console.log(input.startBookDate);
+            if (context.req.isAuth) {
+                throw new Error('Unauthenticated!!');
+            }
+            let booking = Object.assign({}, input);
+            let newBooking = yield booking_1.addNewBooking(booking);
+            return newBooking;
         })
     }
 };

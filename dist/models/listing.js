@@ -17,6 +17,7 @@ const image_1 = require("./image");
 const anemity_1 = require("./anemity");
 const geolocation_1 = require("./geolocation");
 const db_1 = require("../database/db");
+const booking_1 = require("./booking");
 objection_1.Model.knex(db_1.db);
 class Listing extends objection_1.Model {
     static get tableName() {
@@ -30,6 +31,14 @@ class Listing extends objection_1.Model {
                 join: {
                     from: 'listings.users_id',
                     to: 'users.id'
+                }
+            },
+            bookings: {
+                relation: objection_1.Model.HasManyRelation,
+                modelClass: booking_1.Booking,
+                join: {
+                    from: 'listings.id',
+                    to: 'bookings.listings_id'
                 }
             },
             reviews: {
@@ -77,7 +86,12 @@ class Listing extends objection_1.Model {
 }
 exports.Listing = Listing;
 exports.getAllListings = () => __awaiter(void 0, void 0, void 0, function* () {
-    const listings = yield Listing.query().withGraphFetched('reviews');
+    const listings = yield Listing.query()
+        .withGraphFetched('reviews')
+        .withGraphFetched('images')
+        .withGraphFetched('geolocations')
+        .withGraphFetched('anemitys')
+        .withGraphFetched('bookings');
     return listings;
 });
 exports.getListing = (listingId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -86,7 +100,8 @@ exports.getListing = (listingId) => __awaiter(void 0, void 0, void 0, function* 
         .withGraphFetched('reviews')
         .withGraphFetched('images')
         .withGraphFetched('geolocations')
-        .withGraphFetched('anemitys');
+        .withGraphFetched('anemitys')
+        .withGraphFetched('bookings');
     return listing;
 });
 exports.addListing = (listing) => __awaiter(void 0, void 0, void 0, function* () {

@@ -14,11 +14,12 @@ const Review = __importStar(require("./review_schema"));
 const Anemity = __importStar(require("./anemity_schema"));
 const Geolocation = __importStar(require("./geolocation_schema"));
 const Image = __importStar(require("./image_schema"));
+const Booking = __importStar(require("./booking_schema"));
 const types = [];
 const queries = [];
 const inputs = [];
 const mutations = [];
-const schemas = [User, Listing, Review, Image, Geolocation, Anemity];
+const schemas = [User, Listing, Review, Image, Geolocation, Anemity, Booking];
 schemas.forEach(s => {
     types.push(s.types);
     queries.push(s.queries);

@@ -17,6 +17,7 @@ exports.types = `
     images: [Image]
     geolocations: [Geolocation]
     anemitys: [Anemity]
+    bookings: [Booking]
     createdAt: Date
   }
 `;
