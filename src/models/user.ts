@@ -6,6 +6,7 @@ import { gql } from 'apollo-server-express';
 import { db } from '../database/db';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { Booking } from './booking';
 
 Model.knex(db);
 
@@ -42,6 +43,14 @@ export class User extends Model {
         join: {
           from: 'users.id',
           to: 'reviews.users_id'
+        }
+      },
+      bookings: {
+        relation: Model.HasManyRelation,
+        modelClass: Booking,
+        join: {
+          from: 'users.id',
+          to: 'bookings.users_id'
         }
       }
     };
@@ -97,12 +106,19 @@ export const registerUser = async (user: NewUserType): Promise<User> => {
 };
 
 export const getAllUsers = async (): Promise<User[]> => {
-  const users: User[] = await User.query().withGraphFetched('listings');
+  const users: User[] = await User.query()
+    .withGraphFetched('listings')
+    .withGraphFetched('reviews')
+    .withGraphFetched('bookings');
   return users;
 };
 
 export const getUser = async (userId: string): Promise<User> => {
-  const user: User = await User.query().findById(userId);
+  const user: User = await User.query()
+    .findById(userId)
+    .withGraphFetched('listings')
+    .withGraphFetched('reviews')
+    .withGraphFetched('bookings');
   return user;
 };
 

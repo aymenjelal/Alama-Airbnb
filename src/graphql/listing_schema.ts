@@ -13,6 +13,7 @@ export const types = `
     personCapacity: Int
     houseType: String
     rating: Float
+    user: User
     reviews: [Review]
     images: [Image]
     geolocations: [Geolocation]

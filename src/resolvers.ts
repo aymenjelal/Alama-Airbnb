@@ -79,11 +79,9 @@ export const resolvers: IResolvers = {
     description: 'Date custom scalar type',
 
     parseValue(value) {
-      console.log(value);
       return new Date(value); // value from the client
     },
     serialize(value) {
-      console.log(value);
       let sendValue = new Date(value);
       return sendValue.getTime(); // value sent to the client
     },

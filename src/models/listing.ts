@@ -129,6 +129,7 @@ export interface NewListingType {
 
 export const getAllListings = async (): Promise<Listing[]> => {
   const listings: Listing[] = await Listing.query()
+    .withGraphFetched('user')
     .withGraphFetched('reviews')
     .withGraphFetched('images')
     .withGraphFetched('geolocations')
@@ -140,6 +141,7 @@ export const getAllListings = async (): Promise<Listing[]> => {
 export const getListing = async (listingId: string): Promise<Listing> => {
   const listing: Listing = await Listing.query()
     .findById(listingId)
+    .withGraphFetched('user')
     .withGraphFetched('reviews')
     .withGraphFetched('images')
     .withGraphFetched('geolocations')

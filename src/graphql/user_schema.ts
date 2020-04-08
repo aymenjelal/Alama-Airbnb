@@ -14,6 +14,8 @@ export const types = `
     ishost: Boolean
     joinedDate: Date
     listings: [Listing]
+    reviews: [Review]
+    bookings: [Booking]
   }
 
   type deletedNumber{
