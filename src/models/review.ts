@@ -51,14 +51,17 @@ export const addNewReview = async (review: ReviewType): Promise<Review> => {
   review.createdAt = new Date();
   review.lastUpdatedAt = new Date();
 
-  const newReview: Review = await Review.query().insertGraph(
-    {
-      ...review
-    },
-    {
-      relate: true
-    }
-  );
+  const newReview: Review = await Review.query()
+    .insertGraph(
+      {
+        ...review
+      },
+      {
+        relate: true
+      }
+    )
+    .withGraphFetched('user')
+    .withGraphFetched('listing');
 
   return newReview;
 };
@@ -66,21 +69,21 @@ export const addNewReview = async (review: ReviewType): Promise<Review> => {
 export const getReviewbyListing = async (
   listingId: string
 ): Promise<Review[]> => {
-  const reviews: Review[] = await Review.query().where(
-    'listings_id',
-    listingId
-  );
+  const reviews: Review[] = await Review.query()
+    .where('listings_id', listingId)
+    .withGraphFetched('user')
+    .withGraphFetched('listing');
   return reviews;
 };
 
 export const updateReview = async (review: Review): Promise<Review> => {
   review.lastUpdatedAt = new Date();
-  const updatedReview: Review = await Review.query().patchAndFetchById(
-    review.id,
-    {
+  const updatedReview: Review = await Review.query()
+    .patchAndFetchById(review.id, {
       ...review
-    }
-  );
+    })
+    .withGraphFetched('user')
+    .withGraphFetched('listing');
 
   return updatedReview;
 };

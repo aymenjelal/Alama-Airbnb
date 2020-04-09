@@ -1,5 +1,5 @@
 import { Model } from 'objection';
-import { Listing } from './listing';
+import { Listing, getListing } from './listing';
 import { User } from './user';
 import { db } from '../database/db';
 
@@ -41,7 +41,7 @@ export class Booking extends Model {
 
 export interface BookingType {
   user: User;
-  isting: Listing;
+  listing: Listing;
   startBookDate: Date;
   endBookDate: Date;
   bookingDate: Date;
@@ -54,12 +54,20 @@ export const addNewBooking = async (booking: BookingType): Promise<Booking> => {
 
   let newBookingEnd = new Date(booking.endBookDate);
 
+  let bookingListing = await getListing(booking.listing.id);
+
   if (daysBetween(newBookingEnd, newBookingStart) < 1) {
     throw new Error('booking dates are less than a day');
   } else if (daysBetween(newBookingStart, new Date()) < 1) {
     throw new Error('booking start date cant be before current date');
   } else if (daysBetween(newBookingEnd, newBookingStart) > 15) {
     throw new Error('booking cant be for more than 15 days ');
+  }
+
+  if (!bookingListing) {
+    throw new Error('listing doesnt exist');
+  } else if (bookingListing.user.id === booking.user.id) {
+    throw new Error('Users cant book their own listing');
   }
 
   const newBooking: Booking = await Booking.query().insertGraph(
@@ -85,6 +93,19 @@ export const getBookingByListing = async (
   return booking;
 };
 
+export const getBookingByListingDates = async (
+  listingId: string,
+  startDate: Date,
+  endDate: Date
+): Promise<Booking> => {
+  const booking: Booking = await Booking.query()
+    .where('users_id', listingId)
+    .whereBetween('startBookDate', [startDate, endDate])
+    .first();
+
+  return booking;
+};
+
 export const getBookingByUser = async (userId: string): Promise<Booking[]> => {
   const bookings: Booking[] = await Booking.query()
     .where('users_id', userId)
@@ -92,6 +113,19 @@ export const getBookingByUser = async (userId: string): Promise<Booking[]> => {
     .withGraphFetched('user');
 
   return bookings;
+};
+
+export const getBookingByUserDates = async (
+  userId: string,
+  startDate: Date,
+  endDate: Date
+): Promise<Booking> => {
+  const booking: Booking = await Booking.query()
+    .where('users_id', userId)
+    .whereBetween('startBookDate', [startDate, endDate])
+    .first();
+
+  return booking;
 };
 
 function daysBetween(second: Date, first: Date) {

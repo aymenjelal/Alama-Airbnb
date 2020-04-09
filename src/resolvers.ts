@@ -32,7 +32,8 @@ import {
   getBookingByUser,
   Booking,
   addNewBooking,
-  BookingType
+  BookingType,
+  getBookingByListingDates
 } from './models/booking';
 import { Request } from 'express';
 import { val } from 'objection';
@@ -71,7 +72,11 @@ export const resolvers: IResolvers = {
     listing: async (_, { id }) => getListing(id),
     reviewByListing: async (_, { id }) => getReviewbyListing(id),
     bookingByListing: async (_, { id }) => getBookingByListing(id),
-    bookingByUser: async (_, { id }) => getBookingByUser(id)
+    bookingByListingDates: async (_, { id, start, end }) =>
+      getBookingByListingDates(id, start, end),
+    bookingByUser: async (_, { id }) => getBookingByUser(id),
+    bookingByUserDates: async (_, { id, start, end }) =>
+      getBookingByListingDates(id, start, end)
   },
 
   Date: new GraphQLScalarType({

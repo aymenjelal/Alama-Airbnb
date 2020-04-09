@@ -33,7 +33,9 @@ export const inputs = `
 export const queries = `
 
     bookingByListing(id: String): [Booking]
+    bookingByListingDates(id:String, start:Date, end:Date): Booking
     bookingByUser(id: String): [Booking]
+    bookingByUserDates(id:String, start:Date, end:Date) : Booking
 
 `;
 
