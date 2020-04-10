@@ -70,14 +70,33 @@ export const addNewBooking = async (booking: BookingType): Promise<Booking> => {
     throw new Error('Users cant book their own listing');
   }
 
-  const newBooking: Booking = await Booking.query().insertGraph(
-    {
-      ...booking
-    },
-    {
-      relate: true
-    }
+  let existingListingBooking = await getBookingByListingDate(
+    booking.listing.id,
+    booking.startBookDate
   );
+  if (existingListingBooking) {
+    throw new Error('Booking existing for the listing at the start date');
+  }
+
+  let existingUserBooking = await getBookingByUserDate(
+    booking.user.id,
+    booking.startBookDate
+  );
+  if (existingUserBooking) {
+    throw new Error('Booking at start date exists for user');
+  }
+
+  const newBooking: Booking = await Booking.query()
+    .insertGraph(
+      {
+        ...booking
+      },
+      {
+        relate: true
+      }
+    )
+    .withGraphFetched('listing')
+    .withGraphFetched('user');
 
   return newBooking;
 };
@@ -93,15 +112,16 @@ export const getBookingByListing = async (
   return booking;
 };
 
-export const getBookingByListingDates = async (
+export const getBookingByListingDate = async (
   listingId: string,
-  startDate: Date,
-  endDate: Date
+  startDate: Date
 ): Promise<Booking> => {
   const booking: Booking = await Booking.query()
-    .where('users_id', listingId)
-    .whereBetween('startBookDate', [startDate, endDate])
-    .first();
+    .where('listings_id', listingId)
+    .where('endBookDate', '>=', startDate)
+    .first()
+    .withGraphFetched('listing')
+    .withGraphFetched('user');
 
   return booking;
 };
@@ -115,15 +135,21 @@ export const getBookingByUser = async (userId: string): Promise<Booking[]> => {
   return bookings;
 };
 
-export const getBookingByUserDates = async (
+export const getBookingByUserDate = async (
   userId: string,
-  startDate: Date,
-  endDate: Date
+  startDate: Date
 ): Promise<Booking> => {
+  const newStartDate = new Date('2020-04-12');
+  const newEndDate = new Date('2020-04-16');
+
+  console.log(newStartDate.getTime);
+  console.log(newEndDate.getTime);
   const booking: Booking = await Booking.query()
     .where('users_id', userId)
-    .whereBetween('startBookDate', [startDate, endDate])
-    .first();
+    .where('endBookDate', '>=', startDate)
+    .first()
+    .withGraphFetched('listing')
+    .withGraphFetched('user');
 
   return booking;
 };
