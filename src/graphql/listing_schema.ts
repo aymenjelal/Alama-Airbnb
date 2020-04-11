@@ -92,12 +92,30 @@ export const inputs = `
     anemitys: [UpdateAnemityInput]
     geolocations: [UpdateGeolocationInput]
   }
+
+  input ListingFilterInput{
+    country: ListingStringFilterInput
+    city: ListingStringFilterInput
+  }
+
+  input ListingStringFilterInput{
+    contains : String
+  }
+
+  input SearchListingsInput{
+    city: String
+    country: String
+    price: Float
+    personCapacity: Int
+  }
   
 `;
 
 export const queries = `
   listings: [Listing]
   listing(id: String): Listing 
+  listingByUser(id:String): [Listing]
+  searchListing(input: SearchListingsInput): [Listing]
 `;
 
 export const mutations = `

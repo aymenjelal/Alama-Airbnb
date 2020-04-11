@@ -109,6 +109,13 @@ interface NewAnemityType {
   name: string;
 }
 
+interface ListingSearchType {
+  city: string;
+  country: string;
+  price: number;
+  personCapacity: number;
+}
+
 export interface NewListingType {
   name: string;
   price: number;
@@ -151,6 +158,18 @@ export const getListing = async (listingId: string): Promise<Listing> => {
   return listing;
 };
 
+export const getListingByUser = async (userId: string): Promise<Listing[]> => {
+  const listings: Listing[] = await Listing.query()
+    .where('users_id', userId)
+    .withGraphFetched('reviews')
+    .withGraphFetched('images')
+    .withGraphFetched('geolocations')
+    .withGraphFetched('anemitys')
+    .withGraphFetched('bookings');
+
+  return listings;
+};
+
 export const addListing = async (listing: NewListingType): Promise<Listing> => {
   listing.createdAt = new Date();
   const newListing: Listing = await Listing.query().insertGraph(
@@ -176,4 +195,17 @@ export const updateListing = async (listing: Listing): Promise<Listing> => {
   );
 
   return updatedListing;
+};
+
+export const searchListing = async (
+  listingSearch: ListingSearchType
+): Promise<Listing[]> => {
+  const listings: Listing[] = await Listing.query()
+    .skipUndefined()
+    .where('city', 'like', '%' + listingSearch.city + '%')
+    .where('price', '<=', listingSearch.price)
+    .where('personCapacity', '>=', listingSearch.personCapacity)
+    .where('country', 'like', '%' + listingSearch.country + '%');
+
+  return listings;
 };
