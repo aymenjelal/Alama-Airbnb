@@ -13,6 +13,8 @@ exports.types = `
     personCapacity: Int
     houseType: String
     rating: Float
+    status: String
+    user: User
     reviews: [Review]
     images: [Image]
     geolocations: [Geolocation]
@@ -85,16 +87,36 @@ exports.inputs = `
     personCapacity: Int
     houseType: String
     rating: Float
+    status: String
     user: ListingUserInput
     images: [UpdateImageInput]
     anemitys: [UpdateAnemityInput]
     geolocations: [UpdateGeolocationInput]
   }
+
+  input ListingFilterInput{
+    country: ListingStringFilterInput
+    city: ListingStringFilterInput
+  }
+
+  input ListingStringFilterInput{
+    contains : String
+  }
+
+  input SearchListingsInput{
+    city: String
+    country: String
+    price: Float
+    personCapacity: Int
+  }
   
 `;
 exports.queries = `
-  listings: [Listing]
+  allListings: [Listing]
+  activeListings: [Listing]
   listing(id: String): Listing 
+  listingByUser(id:String): [Listing]
+  searchListing(input: SearchListingsInput): [Listing]
 `;
 exports.mutations = `
 

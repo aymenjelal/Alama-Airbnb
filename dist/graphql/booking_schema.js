@@ -32,7 +32,9 @@ exports.inputs = `
 exports.queries = `
 
     bookingByListing(id: String): [Booking]
+    bookingByListingDate(id:String, start:Date): Booking
     bookingByUser(id: String): [Booking]
+    bookingByUserDate(id:String, start:Date) : Booking
 
 `;
 exports.mutations = `

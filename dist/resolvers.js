@@ -41,21 +41,24 @@ exports.resolvers = {
         users: () => __awaiter(void 0, void 0, void 0, function* () { return user_1.getAllUsers(); }),
         user: (_, { id }) => __awaiter(void 0, void 0, void 0, function* () { return user_1.getUser(id); }),
         login: (_, { email, password }) => __awaiter(void 0, void 0, void 0, function* () { return user_1.loginUser(email, password); }),
-        listings: () => __awaiter(void 0, void 0, void 0, function* () { return listing_1.getAllListings(); }),
+        allListings: () => __awaiter(void 0, void 0, void 0, function* () { return listing_1.getAllListings(); }),
+        activeListings: () => __awaiter(void 0, void 0, void 0, function* () { return listing_1.getActiveListings(); }),
         listing: (_, { id }) => __awaiter(void 0, void 0, void 0, function* () { return listing_1.getListing(id); }),
+        listingByUser: (_, { id }) => __awaiter(void 0, void 0, void 0, function* () { return listing_1.getListingByUser(id); }),
+        searchListing: (_, { input }) => __awaiter(void 0, void 0, void 0, function* () { return listing_1.searchListing(input); }),
         reviewByListing: (_, { id }) => __awaiter(void 0, void 0, void 0, function* () { return review_1.getReviewbyListing(id); }),
         bookingByListing: (_, { id }) => __awaiter(void 0, void 0, void 0, function* () { return booking_1.getBookingByListing(id); }),
-        bookingByUser: (_, { id }) => __awaiter(void 0, void 0, void 0, function* () { return booking_1.getBookingByUser(id); })
+        bookingByListingDate: (_, { id, start, end }) => __awaiter(void 0, void 0, void 0, function* () { return booking_1.getBookingByListingDate(id, start); }),
+        bookingByUser: (_, { id }) => __awaiter(void 0, void 0, void 0, function* () { return booking_1.getBookingByUser(id); }),
+        bookingByUserDate: (_, { id, start, end }) => __awaiter(void 0, void 0, void 0, function* () { return booking_1.getBookingByUserDate(id, start); })
     },
     Date: new graphql_1.GraphQLScalarType({
         name: 'Date',
         description: 'Date custom scalar type',
         parseValue(value) {
-            console.log(value);
             return new Date(value); // value from the client
         },
         serialize(value) {
-            console.log(value);
             let sendValue = new Date(value);
             return sendValue.getTime(); // value sent to the client
         },
@@ -133,7 +136,7 @@ exports.resolvers = {
         }),
         addBooking: (_, { input }, context) => __awaiter(void 0, void 0, void 0, function* () {
             //console.log(input.startBookDate);
-            if (context.req.isAuth) {
+            if (!context.req.isAuth) {
                 throw new Error('Unauthenticated!!');
             }
             let booking = Object.assign({}, input);

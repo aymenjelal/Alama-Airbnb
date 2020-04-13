@@ -43,18 +43,27 @@ exports.Review = Review;
 exports.addNewReview = (review) => __awaiter(void 0, void 0, void 0, function* () {
     review.createdAt = new Date();
     review.lastUpdatedAt = new Date();
-    const newReview = yield Review.query().insertGraph(Object.assign({}, review), {
+    const newReview = yield Review.query()
+        .insertGraph(Object.assign({}, review), {
         relate: true
-    });
+    })
+        .withGraphFetched('user')
+        .withGraphFetched('listing');
     return newReview;
 });
 exports.getReviewbyListing = (listingId) => __awaiter(void 0, void 0, void 0, function* () {
-    const reviews = yield Review.query().where('listings_id', listingId);
+    const reviews = yield Review.query()
+        .where('listings_id', listingId)
+        .withGraphFetched('user')
+        .withGraphFetched('listing');
     return reviews;
 });
 exports.updateReview = (review) => __awaiter(void 0, void 0, void 0, function* () {
     review.lastUpdatedAt = new Date();
-    const updatedReview = yield Review.query().patchAndFetchById(review.id, Object.assign({}, review));
+    const updatedReview = yield Review.query()
+        .patchAndFetchById(review.id, Object.assign({}, review))
+        .withGraphFetched('user')
+        .withGraphFetched('listing');
     return updatedReview;
 });
 exports.deleteReview = (reviewId) => __awaiter(void 0, void 0, void 0, function* () {

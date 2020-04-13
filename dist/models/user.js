@@ -18,6 +18,7 @@ const knex_schema_1 = require("./knex_schema");
 const db_1 = require("../database/db");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const booking_1 = require("./booking");
 objection_1.Model.knex(db_1.db);
 class User extends objection_1.Model {
     static get tableName() {
@@ -40,6 +41,14 @@ class User extends objection_1.Model {
                     from: 'users.id',
                     to: 'reviews.users_id'
                 }
+            },
+            bookings: {
+                relation: objection_1.Model.HasManyRelation,
+                modelClass: booking_1.Booking,
+                join: {
+                    from: 'users.id',
+                    to: 'bookings.users_id'
+                }
             }
         };
     }
@@ -58,11 +67,18 @@ exports.registerUser = (user) => __awaiter(void 0, void 0, void 0, function* () 
     return registeredUser;
 });
 exports.getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
-    const users = yield User.query().withGraphFetched('listings');
+    const users = yield User.query()
+        .withGraphFetched('listings')
+        .withGraphFetched('reviews')
+        .withGraphFetched('bookings');
     return users;
 });
 exports.getUser = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield User.query().findById(userId);
+    const user = yield User.query()
+        .findById(userId)
+        .withGraphFetched('listings')
+        .withGraphFetched('reviews')
+        .withGraphFetched('bookings');
     return user;
 });
 exports.updateUser = (user) => __awaiter(void 0, void 0, void 0, function* () {

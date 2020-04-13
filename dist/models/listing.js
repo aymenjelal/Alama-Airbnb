@@ -87,6 +87,18 @@ class Listing extends objection_1.Model {
 exports.Listing = Listing;
 exports.getAllListings = () => __awaiter(void 0, void 0, void 0, function* () {
     const listings = yield Listing.query()
+        .withGraphFetched('user')
+        .withGraphFetched('reviews')
+        .withGraphFetched('images')
+        .withGraphFetched('geolocations')
+        .withGraphFetched('anemitys')
+        .withGraphFetched('bookings');
+    return listings;
+});
+exports.getActiveListings = () => __awaiter(void 0, void 0, void 0, function* () {
+    const listings = yield Listing.query()
+        .where('status', 'active')
+        .withGraphFetched('user')
         .withGraphFetched('reviews')
         .withGraphFetched('images')
         .withGraphFetched('geolocations')
@@ -97,6 +109,7 @@ exports.getAllListings = () => __awaiter(void 0, void 0, void 0, function* () {
 exports.getListing = (listingId) => __awaiter(void 0, void 0, void 0, function* () {
     const listing = yield Listing.query()
         .findById(listingId)
+        .withGraphFetched('user')
         .withGraphFetched('reviews')
         .withGraphFetched('images')
         .withGraphFetched('geolocations')
@@ -104,16 +117,56 @@ exports.getListing = (listingId) => __awaiter(void 0, void 0, void 0, function* 
         .withGraphFetched('bookings');
     return listing;
 });
+exports.getListingByUser = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const listings = yield Listing.query()
+        .where('users_id', userId)
+        .withGraphFetched('reviews')
+        .withGraphFetched('images')
+        .withGraphFetched('geolocations')
+        .withGraphFetched('anemitys')
+        .withGraphFetched('bookings');
+    return listings;
+});
 exports.addListing = (listing) => __awaiter(void 0, void 0, void 0, function* () {
     listing.createdAt = new Date();
-    const newListing = yield Listing.query().insertGraph(Object.assign({}, listing), {
+    listing.status = 'active';
+    const newListing = yield Listing.query()
+        .insertGraph(Object.assign({}, listing), {
         relate: true
-    });
+    })
+        .withGraphFetched('user')
+        .withGraphFetched('reviews')
+        .withGraphFetched('images')
+        .withGraphFetched('geolocations')
+        .withGraphFetched('anemitys')
+        .withGraphFetched('bookings');
     return newListing;
 });
 exports.updateListing = (listing) => __awaiter(void 0, void 0, void 0, function* () {
-    const updatedListing = yield Listing.query().upsertGraphAndFetch(Object.assign({}, listing), {
+    const updatedListing = yield Listing.query()
+        .upsertGraphAndFetch(Object.assign({}, listing), {
         relate: true
-    });
+    })
+        .withGraphFetched('user')
+        .withGraphFetched('reviews')
+        .withGraphFetched('images')
+        .withGraphFetched('geolocations')
+        .withGraphFetched('anemitys')
+        .withGraphFetched('bookings');
     return updatedListing;
+});
+exports.searchListing = (listingSearch) => __awaiter(void 0, void 0, void 0, function* () {
+    const listings = yield Listing.query()
+        .skipUndefined()
+        .where('city', 'like', '%' + listingSearch.city + '%')
+        .where('price', '<=', listingSearch.price)
+        .where('personCapacity', '>=', listingSearch.personCapacity)
+        .where('country', 'like', '%' + listingSearch.country + '%')
+        .withGraphFetched('user')
+        .withGraphFetched('reviews')
+        .withGraphFetched('images')
+        .withGraphFetched('geolocations')
+        .withGraphFetched('anemitys')
+        .withGraphFetched('bookings');
+    return listings;
 });

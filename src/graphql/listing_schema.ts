@@ -13,6 +13,7 @@ export const types = `
     personCapacity: Int
     houseType: String
     rating: Float
+    status: String
     user: User
     reviews: [Review]
     images: [Image]
@@ -87,6 +88,7 @@ export const inputs = `
     personCapacity: Int
     houseType: String
     rating: Float
+    status: String
     user: ListingUserInput
     images: [UpdateImageInput]
     anemitys: [UpdateAnemityInput]
@@ -112,7 +114,8 @@ export const inputs = `
 `;
 
 export const queries = `
-  listings: [Listing]
+  allListings: [Listing]
+  activeListings: [Listing]
   listing(id: String): Listing 
   listingByUser(id:String): [Listing]
   searchListing(input: SearchListingsInput): [Listing]

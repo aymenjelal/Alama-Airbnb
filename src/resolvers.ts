@@ -18,7 +18,8 @@ import {
   updateListing,
   Listing,
   searchListing,
-  getListingByUser
+  getListingByUser,
+  getActiveListings
 } from './models/listing';
 import { GraphQLScalarType, Kind } from 'graphql';
 import {
@@ -71,7 +72,8 @@ export const resolvers: IResolvers = {
     users: async () => getAllUsers(),
     user: async (_, { id }) => getUser(id),
     login: async (_, { email, password }) => loginUser(email, password),
-    listings: async () => getAllListings(),
+    allListings: async () => getAllListings(),
+    activeListings: async () => getActiveListings(),
     listing: async (_, { id }) => getListing(id),
     listingByUser: async (_, { id }) => getListingByUser(id),
     searchListing: async (_, { input }) => searchListing(input),

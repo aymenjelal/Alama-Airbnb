@@ -23,6 +23,7 @@ export class Listing extends Model {
   personCapacity!: number;
   houseType!: string;
   rating!: number;
+  status!: string;
   user!: User;
   geolocations!: Geolocation[];
   images!: ListingImage[];
@@ -131,11 +132,24 @@ export interface NewListingType {
   geolocations: NewGeolocationType[];
   images: NewImageType[];
   anemitys: NewAnemityType[];
+  status: string;
   createdAt: Date;
 }
 
 export const getAllListings = async (): Promise<Listing[]> => {
   const listings: Listing[] = await Listing.query()
+    .withGraphFetched('user')
+    .withGraphFetched('reviews')
+    .withGraphFetched('images')
+    .withGraphFetched('geolocations')
+    .withGraphFetched('anemitys')
+    .withGraphFetched('bookings');
+  return listings;
+};
+
+export const getActiveListings = async (): Promise<Listing[]> => {
+  const listings: Listing[] = await Listing.query()
+    .where('status', 'active')
     .withGraphFetched('user')
     .withGraphFetched('reviews')
     .withGraphFetched('images')
@@ -172,27 +186,42 @@ export const getListingByUser = async (userId: string): Promise<Listing[]> => {
 
 export const addListing = async (listing: NewListingType): Promise<Listing> => {
   listing.createdAt = new Date();
-  const newListing: Listing = await Listing.query().insertGraph(
-    {
-      ...listing
-    },
-    {
-      relate: true
-    }
-  );
+  listing.status = 'active';
+  const newListing: Listing = await Listing.query()
+    .insertGraph(
+      {
+        ...listing
+      },
+      {
+        relate: true
+      }
+    )
+    .withGraphFetched('user')
+    .withGraphFetched('reviews')
+    .withGraphFetched('images')
+    .withGraphFetched('geolocations')
+    .withGraphFetched('anemitys')
+    .withGraphFetched('bookings');
 
   return newListing;
 };
 
 export const updateListing = async (listing: Listing): Promise<Listing> => {
-  const updatedListing: Listing = await Listing.query().upsertGraphAndFetch(
-    {
-      ...listing
-    },
-    {
-      relate: true
-    }
-  );
+  const updatedListing: Listing = await Listing.query()
+    .upsertGraphAndFetch(
+      {
+        ...listing
+      },
+      {
+        relate: true
+      }
+    )
+    .withGraphFetched('user')
+    .withGraphFetched('reviews')
+    .withGraphFetched('images')
+    .withGraphFetched('geolocations')
+    .withGraphFetched('anemitys')
+    .withGraphFetched('bookings');
 
   return updatedListing;
 };
@@ -205,7 +234,13 @@ export const searchListing = async (
     .where('city', 'like', '%' + listingSearch.city + '%')
     .where('price', '<=', listingSearch.price)
     .where('personCapacity', '>=', listingSearch.personCapacity)
-    .where('country', 'like', '%' + listingSearch.country + '%');
+    .where('country', 'like', '%' + listingSearch.country + '%')
+    .withGraphFetched('user')
+    .withGraphFetched('reviews')
+    .withGraphFetched('images')
+    .withGraphFetched('geolocations')
+    .withGraphFetched('anemitys')
+    .withGraphFetched('bookings');
 
   return listings;
 };
