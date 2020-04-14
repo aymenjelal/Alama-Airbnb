@@ -176,6 +176,17 @@ export const getListing = async (listingId: string): Promise<Listing> => {
   return listing;
 };
 
+export const getListingByIdAndUser = async (
+  listingId: string,
+  userId: string
+): Promise<Listing> => {
+  const listing: Listing = await Listing.query()
+    .findById(listingId)
+    .where('users_id', userId);
+
+  return listing;
+};
+
 export const getListingByUser = async (userId: string): Promise<Listing[]> => {
   const listings: Listing[] = await Listing.query()
     .where('users_id', userId)
@@ -210,7 +221,15 @@ export const addListing = async (listing: NewListingType): Promise<Listing> => {
   return newListing;
 };
 
-export const updateListing = async (listing: Listing): Promise<Listing> => {
+export const updateListing = async (
+  listing: Listing,
+  userId: string
+): Promise<Listing> => {
+  let checkListing = await getListingByIdAndUser(listing.id, userId);
+
+  if (!checkListing) {
+    throw new Error('Listing doesnt exist for the user');
+  }
   const updatedListing: Listing = await Listing.query()
     .upsertGraphAndFetch(
       {
@@ -249,7 +268,16 @@ export const searchListing = async (
   return listings;
 };
 
-export const deleteListing = async (listingId: string): Promise<Number> => {
+export const deleteListing = async (
+  listingId: string,
+  userId: string
+): Promise<Number> => {
+  let checkListing = await getListingByIdAndUser(listingId, userId);
+
+  if (!checkListing) {
+    throw new Error('Listing doesnt exist for the user');
+  }
+
   let futureBooking = await getFutureBookingByListing(listingId);
 
   if (futureBooking.length != 0) {

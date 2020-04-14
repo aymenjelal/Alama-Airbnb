@@ -160,8 +160,6 @@ export const getFutureBookingByListing = async (
 ): Promise<Booking[]> => {
   const today = dateFormat(new Date(), 'yyyy-mm-dd');
 
-  console.log(today);
-
   const futureBookings: Booking[] = await Booking.query()
     .where('listings_id', listingId)
     .where('endBookDate', '>=', today);

@@ -158,7 +158,8 @@ export const resolvers: IResolvers = {
         ...input
       };
 
-      let updatedListing = await updateListing(listing);
+      let userId: string = context.req.userId;
+      let updatedListing = await updateListing(listing, userId);
 
       return updatedListing;
     },
@@ -167,7 +168,9 @@ export const resolvers: IResolvers = {
       if (!context.req.isAuth) {
         throw new Error('Unauthenticated!!');
       }
-      let deletedListing: Number = await deleteListing(input);
+
+      let userId: string = context.req.userId;
+      let deletedListing: Number = await deleteListing(input, userId);
       return {
         deleted: deletedListing
       };
