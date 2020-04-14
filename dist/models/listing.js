@@ -170,3 +170,12 @@ exports.searchListing = (listingSearch) => __awaiter(void 0, void 0, void 0, fun
         .withGraphFetched('bookings');
     return listings;
 });
+exports.deleteListing = (listingId) => __awaiter(void 0, void 0, void 0, function* () {
+    let futureBooking = yield booking_1.getFutureBookingByListing(listingId);
+    if (futureBooking.length != 0) {
+        throw new Error('bookings exist for the listing, cant be deleted');
+    }
+    let deletedBooking = yield booking_1.deleteBookingByListing(listingId);
+    const deletedListing = yield Listing.query().deleteById(listingId);
+    return deletedListing;
+});

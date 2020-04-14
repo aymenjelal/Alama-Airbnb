@@ -7,7 +7,11 @@ import { ListingImage } from './image';
 import { Anemity } from './anemity';
 import { Geolocation } from './geolocation';
 import { db } from '../database/db';
-import { Booking } from './booking';
+import {
+  Booking,
+  getFutureBookingByListing,
+  deleteBookingByListing
+} from './booking';
 
 Model.knex(db);
 
@@ -243,4 +247,17 @@ export const searchListing = async (
     .withGraphFetched('bookings');
 
   return listings;
+};
+
+export const deleteListing = async (listingId: string): Promise<Number> => {
+  let futureBooking = await getFutureBookingByListing(listingId);
+
+  if (futureBooking.length != 0) {
+    throw new Error('bookings exist for the listing, cant be deleted');
+  }
+
+  let deletedBooking = await deleteBookingByListing(listingId);
+
+  const deletedListing: number = await Listing.query().deleteById(listingId);
+  return deletedListing;
 };

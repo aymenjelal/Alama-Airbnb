@@ -19,7 +19,8 @@ import {
   Listing,
   searchListing,
   getListingByUser,
-  getActiveListings
+  getActiveListings,
+  deleteListing
 } from './models/listing';
 import { GraphQLScalarType, Kind } from 'graphql';
 import {
@@ -160,6 +161,16 @@ export const resolvers: IResolvers = {
       let updatedListing = await updateListing(listing);
 
       return updatedListing;
+    },
+
+    deleteListing: async (_, { input }, context) => {
+      if (!context.req.isAuth) {
+        throw new Error('Unauthenticated!!');
+      }
+      let deletedListing: Number = await deleteListing(input);
+      return {
+        deleted: deletedListing
+      };
     },
 
     addReview: async (_, { input }, context) => {

@@ -111,6 +111,15 @@ exports.resolvers = {
             let updatedListing = yield listing_1.updateListing(listing);
             return updatedListing;
         }),
+        deleteListing: (_, { input }, context) => __awaiter(void 0, void 0, void 0, function* () {
+            if (!context.req.isAuth) {
+                throw new Error('Unauthenticated!!');
+            }
+            let deletedListing = yield listing_1.deleteListing(input);
+            return {
+                deleted: deletedListing
+            };
+        }),
         addReview: (_, { input }, context) => __awaiter(void 0, void 0, void 0, function* () {
             if (!context.req.isAuth) {
                 throw new Error('Unauthenticated!!');

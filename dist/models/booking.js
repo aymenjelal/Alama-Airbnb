@@ -13,6 +13,7 @@ const objection_1 = require("objection");
 const listing_1 = require("./listing");
 const user_1 = require("./user");
 const db_1 = require("../database/db");
+var dateFormat = require('dateformat');
 objection_1.Model.knex(db_1.db);
 class Booking extends objection_1.Model {
     static get tableName() {
@@ -111,6 +112,20 @@ exports.getBookingByUserDate = (userId, startDate) => __awaiter(void 0, void 0, 
         .withGraphFetched('listing')
         .withGraphFetched('user');
     return booking;
+});
+exports.getFutureBookingByListing = (listingId) => __awaiter(void 0, void 0, void 0, function* () {
+    const today = dateFormat(new Date(), 'yyyy-mm-dd');
+    console.log(today);
+    const futureBookings = yield Booking.query()
+        .where('listings_id', listingId)
+        .where('endBookDate', '>=', today);
+    return futureBookings;
+});
+exports.deleteBookingByListing = (listingId) => __awaiter(void 0, void 0, void 0, function* () {
+    const deletedBooking = yield Booking.query()
+        .delete()
+        .where('listings_id', listingId);
+    return deletedBooking;
 });
 function daysBetween(second, first) {
     // Copy date parts of the timestamps, discarding the time parts.

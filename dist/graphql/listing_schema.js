@@ -122,6 +122,7 @@ exports.mutations = `
 
   addNewListing(input: NewListingInput): Listing!
   updateListing(input: UpdateListingInput): Listing!
+  deleteListing(input: String): deletedNumber!
 
 
 `;

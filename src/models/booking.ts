@@ -2,6 +2,7 @@ import { Model } from 'objection';
 import { Listing, getListing } from './listing';
 import { User } from './user';
 import { db } from '../database/db';
+var dateFormat = require('dateformat');
 
 Model.knex(db);
 
@@ -152,6 +153,30 @@ export const getBookingByUserDate = async (
     .withGraphFetched('user');
 
   return booking;
+};
+
+export const getFutureBookingByListing = async (
+  listingId: string
+): Promise<Booking[]> => {
+  const today = dateFormat(new Date(), 'yyyy-mm-dd');
+
+  console.log(today);
+
+  const futureBookings: Booking[] = await Booking.query()
+    .where('listings_id', listingId)
+    .where('endBookDate', '>=', today);
+
+  return futureBookings;
+};
+
+export const deleteBookingByListing = async (
+  listingId: string
+): Promise<Number> => {
+  const deletedBooking: number = await Booking.query()
+    .delete()
+    .where('listings_id', listingId);
+
+  return deletedBooking;
 };
 
 function daysBetween(second: Date, first: Date) {
