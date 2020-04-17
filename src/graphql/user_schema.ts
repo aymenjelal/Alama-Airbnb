@@ -53,7 +53,6 @@ export const inputs = `
       phone: String
       language: String
       ishost: Boolean
-      confirmed: Boolean
       password: String
   }
 `;

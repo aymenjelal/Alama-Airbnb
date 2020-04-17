@@ -142,19 +142,19 @@ export const resolvers: IResolvers = {
     },
 
     updateUser: async (_, { input }, context) => {
-      // if (!context.req.isAuth) {
-      //   throw new Error('Unauthenticated!!');
-      // }
+      if (!context.req.isAuth) {
+        throw new Error('Unauthenticated!!');
+      }
 
       let user: UpdateUserType = {
         ...input
       };
 
-      // if (context.req.userId != user.id) {
-      //   throw new Error(
-      //     'Authenticated user is not the same as user to be updated'
-      //   );
-      // }
+      if (context.req.userId != user.id) {
+        throw new Error(
+          'Authenticated user is not the same as user to be updated'
+        );
+      }
       let updatedUser = await updateUser(user);
       return updatedUser;
     },
