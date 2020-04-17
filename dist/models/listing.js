@@ -117,6 +117,12 @@ exports.getListing = (listingId) => __awaiter(void 0, void 0, void 0, function* 
         .withGraphFetched('bookings');
     return listing;
 });
+exports.getListingByIdAndUser = (listingId, userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const listing = yield Listing.query()
+        .findById(listingId)
+        .where('users_id', userId);
+    return listing;
+});
 exports.getListingByUser = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     const listings = yield Listing.query()
         .where('users_id', userId)
@@ -142,7 +148,11 @@ exports.addListing = (listing) => __awaiter(void 0, void 0, void 0, function* ()
         .withGraphFetched('bookings');
     return newListing;
 });
-exports.updateListing = (listing) => __awaiter(void 0, void 0, void 0, function* () {
+exports.updateListing = (listing, userId) => __awaiter(void 0, void 0, void 0, function* () {
+    let checkListing = yield exports.getListingByIdAndUser(listing.id, userId);
+    if (!checkListing) {
+        throw new Error('Listing doesnt exist for the user');
+    }
     const updatedListing = yield Listing.query()
         .upsertGraphAndFetch(Object.assign({}, listing), {
         relate: true
@@ -170,7 +180,11 @@ exports.searchListing = (listingSearch) => __awaiter(void 0, void 0, void 0, fun
         .withGraphFetched('bookings');
     return listings;
 });
-exports.deleteListing = (listingId) => __awaiter(void 0, void 0, void 0, function* () {
+exports.deleteListing = (listingId, userId) => __awaiter(void 0, void 0, void 0, function* () {
+    let checkListing = yield exports.getListingByIdAndUser(listingId, userId);
+    if (!checkListing) {
+        throw new Error('Listing doesnt exist for the user');
+    }
     let futureBooking = yield booking_1.getFutureBookingByListing(listingId);
     if (futureBooking.length != 0) {
         throw new Error('bookings exist for the listing, cant be deleted');

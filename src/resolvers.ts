@@ -42,6 +42,8 @@ import {
 } from './models/booking';
 import { Request } from 'express';
 import { val } from 'objection';
+import jwt from 'jsonwebtoken';
+import { sendConfirmationEmail } from './services/EmailService';
 //require('dotenv').config();
 
 // interface NewUserType {
@@ -109,11 +111,33 @@ export const resolvers: IResolvers = {
   }),
 
   Mutation: {
-    registerUsers: async (_, { input }) => {
+    registerUsers: async (_, { input, transporter, models, EMAIL_SECRET }) => {
       let newUser: NewUserType = {
         ...input
       };
       let registeredUser = await registerUser(newUser);
+
+      sendConfirmationEmail(registeredUser);
+
+      // jwt.sign(
+      //   {
+      //     user: registeredUser.id,
+      //   },
+      //   EMAIL_SECRET,
+      //   {
+      //     expiresIn: '1d',
+      //   },
+      //   (err, emailToken) => {
+      //     const url = `http://localhost:3000/confirmation/${emailToken}`;
+
+      //     transporter.sendMail({
+      //       to: newUser.email,
+      //       subject: 'Confirm Email',
+      //       html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`,
+      //     });
+      //   },
+      // );
+
       return registeredUser;
     },
 

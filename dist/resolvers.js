@@ -14,6 +14,7 @@ const listing_1 = require("./models/listing");
 const graphql_1 = require("graphql");
 const review_1 = require("./models/review");
 const booking_1 = require("./models/booking");
+const EmailService_1 = require("./services/EmailService");
 //require('dotenv').config();
 // interface NewUserType {
 //   firstName: string;
@@ -73,9 +74,27 @@ exports.resolvers = {
         }
     }),
     Mutation: {
-        registerUsers: (_, { input }) => __awaiter(void 0, void 0, void 0, function* () {
+        registerUsers: (_, { input, transporter, models, EMAIL_SECRET }) => __awaiter(void 0, void 0, void 0, function* () {
             let newUser = Object.assign({}, input);
             let registeredUser = yield user_1.registerUser(newUser);
+            EmailService_1.sendConfirmationEmail(registeredUser);
+            // jwt.sign(
+            //   {
+            //     user: registeredUser.id,
+            //   },
+            //   EMAIL_SECRET,
+            //   {
+            //     expiresIn: '1d',
+            //   },
+            //   (err, emailToken) => {
+            //     const url = `http://localhost:3000/confirmation/${emailToken}`;
+            //     transporter.sendMail({
+            //       to: newUser.email,
+            //       subject: 'Confirm Email',
+            //       html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`,
+            //     });
+            //   },
+            // );
             return registeredUser;
         }),
         updateUser: (_, { input }, context) => __awaiter(void 0, void 0, void 0, function* () {
@@ -108,14 +127,16 @@ exports.resolvers = {
                 throw new Error('Unauthenticated!!');
             }
             let listing = Object.assign({}, input);
-            let updatedListing = yield listing_1.updateListing(listing);
+            let userId = context.req.userId;
+            let updatedListing = yield listing_1.updateListing(listing, userId);
             return updatedListing;
         }),
         deleteListing: (_, { input }, context) => __awaiter(void 0, void 0, void 0, function* () {
             if (!context.req.isAuth) {
                 throw new Error('Unauthenticated!!');
             }
-            let deletedListing = yield listing_1.deleteListing(input);
+            let userId = context.req.userId;
+            let deletedListing = yield listing_1.deleteListing(input, userId);
             return {
                 deleted: deletedListing
             };

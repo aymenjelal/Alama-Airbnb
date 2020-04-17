@@ -94,6 +94,9 @@ exports.loginUser = (email, password) => __awaiter(void 0, void 0, void 0, funct
     if (!user) {
         throw new Error('user doesnt exist');
     }
+    if (!user.confirmed) {
+        throw new Error('user is not confirmed');
+    }
     const passEqual = yield bcryptjs_1.default.compare(password, user.password);
     if (!passEqual) {
         throw new Error('user doesnt exist');

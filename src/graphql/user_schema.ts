@@ -12,6 +12,7 @@ export const types = `
     phone: String
     language: String
     ishost: Boolean
+    confirmed: Boolean
     joinedDate: Date
     listings: [Listing]
     reviews: [Review]

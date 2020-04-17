@@ -115,7 +115,6 @@ exports.getBookingByUserDate = (userId, startDate) => __awaiter(void 0, void 0, 
 });
 exports.getFutureBookingByListing = (listingId) => __awaiter(void 0, void 0, void 0, function* () {
     const today = dateFormat(new Date(), 'yyyy-mm-dd');
-    console.log(today);
     const futureBookings = yield Booking.query()
         .where('listings_id', listingId)
         .where('endBookDate', '>=', today);

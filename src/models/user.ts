@@ -20,6 +20,7 @@ export class User extends Model {
   phone!: string;
   language!: string;
   ishost!: boolean;
+  confirmed!: boolean;
   password!: string;
   joinedDate!: Date;
 
@@ -80,6 +81,7 @@ export interface UpdateUserType {
   phone: string;
   language: string;
   ishost: boolean;
+  confirmed: boolean;
   password: string;
 }
 
@@ -142,6 +144,10 @@ export const loginUser = async (
   const user: User = await User.query().findOne({ email: email });
   if (!user) {
     throw new Error('user doesnt exist');
+  }
+
+  if (!user.confirmed) {
+    throw new Error('user is not confirmed');
   }
 
   const passEqual = await bcrypt.compare(password, user.password);
