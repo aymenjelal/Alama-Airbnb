@@ -125,6 +125,11 @@ export const getUser = async (userId: string): Promise<User> => {
 };
 
 export const updateUser = async (user: UpdateUserType): Promise<User> => {
+  const existingUser: User = await User.query().findById(user.id);
+
+  if (!existingUser) {
+    throw new Error('user doesnt exist');
+  }
   const updatedUser: User = await User.query().patchAndFetchById(user.id, {
     ...user
   });

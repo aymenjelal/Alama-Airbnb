@@ -111,7 +111,7 @@ export const resolvers: IResolvers = {
   }),
 
   Mutation: {
-    registerUsers: async (_, { input, transporter, models, EMAIL_SECRET }) => {
+    registerUsers: async (_, { input }) => {
       let newUser: NewUserType = {
         ...input
       };
@@ -142,12 +142,19 @@ export const resolvers: IResolvers = {
     },
 
     updateUser: async (_, { input }, context) => {
-      if (!context.req.isAuth) {
-        throw new Error('Unauthenticated!!');
-      }
+      // if (!context.req.isAuth) {
+      //   throw new Error('Unauthenticated!!');
+      // }
+
       let user: UpdateUserType = {
         ...input
       };
+
+      // if (context.req.userId != user.id) {
+      //   throw new Error(
+      //     'Authenticated user is not the same as user to be updated'
+      //   );
+      // }
       let updatedUser = await updateUser(user);
       return updatedUser;
     },
@@ -156,6 +163,13 @@ export const resolvers: IResolvers = {
       if (!context.req.isAuth) {
         throw new Error('Unauthenticated!!');
       }
+
+      if (context.req.userId != input) {
+        throw new Error(
+          'Authenticated user is not the same as user to be updated'
+        );
+      }
+
       let deletedUser: Number = await deleteUser(input);
       return {
         deleted: deletedUser
