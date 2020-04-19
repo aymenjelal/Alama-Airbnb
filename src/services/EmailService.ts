@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import { User, NewUserType } from '../models/user';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
+import { Listing } from '../models/listing';
 require('dotenv').config();
 
 const oauth2Client = new OAuth2Client(
@@ -14,14 +15,6 @@ oauth2Client.setCredentials({
   refresh_token:
     '1//04tfgZpaDjq2MCgYIARAAGAQSNwF-L9IryTc1QkRT131141c3GJbgmfRF6WLlG5NKBezPUBxT8NtY80SIUaRs4f4zpRXe1ci2wCQ'
 });
-
-// const getAccessToken = async() =>{
-//   return await oauth2Client.getAccessToken();
-// }
-
-// const createTransporter = async() =>{
-//   const accessToken = await getAccessToken()
-// }
 
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
@@ -65,6 +58,34 @@ export const sendConfirmationEmail = (user: User) => {
       to: user.email,
       subject: 'Confirm Email',
       html: `Please click this email to confirm your email: <a href="${confirmURL}">${confirmURL}</a>`
+    })
+    .then(() => {
+      console.log('email sent');
+    })
+    .catch(() => {
+      console.log('problem sending email');
+    });
+};
+
+export const sendUpdateListingEmail = (user: User, listing: Listing) => {
+  transporter
+    .sendMail({
+      to: user.email,
+      subject: 'Updated Listing',
+      html: `The booking you made at ${listing.name} has been updated. 
+      <br />
+      <br />
+      At the time of your booking the price was ${listing.price} dollars <br />
+       - ${listing.bedrooms} bedrooms <br />
+       - ${listing.bathrooms} bathrooms <br />
+       - ${listing.personCapacity} person capacity <br />
+       - with anemities <br />
+         ${listing.anemitys.map(anemity => {
+           return anemity.name;
+         })} <br/>
+
+        <b> Please make sure all these are fulfilled </b>
+      `
     })
     .then(() => {
       console.log('email sent');

@@ -162,7 +162,9 @@ export const getFutureBookingByListing = async (
 
   const futureBookings: Booking[] = await Booking.query()
     .where('listings_id', listingId)
-    .where('endBookDate', '>=', today);
+    .where('endBookDate', '>=', today)
+    .withGraphFetched('listing')
+    .withGraphFetched('user');
 
   return futureBookings;
 };

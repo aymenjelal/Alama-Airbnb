@@ -10,8 +10,10 @@ import { db } from '../database/db';
 import {
   Booking,
   getFutureBookingByListing,
-  deleteBookingByListing
+  deleteBookingByListing,
+  getBookingByListing
 } from './booking';
+import { sendUpdateListingEmail } from '../services/EmailService';
 
 Model.knex(db);
 
@@ -230,6 +232,15 @@ export const updateListing = async (
   if (!checkListing) {
     throw new Error('Listing doesnt exist for the user');
   }
+
+  let listingBookings = await getFutureBookingByListing(listing.id);
+
+  let originalListing = await getListing(listing.id);
+
+  listingBookings.forEach(booking => {
+    sendUpdateListingEmail(booking.user, originalListing);
+  });
+
   const updatedListing: Listing = await Listing.query()
     .upsertGraphAndFetch(
       {
