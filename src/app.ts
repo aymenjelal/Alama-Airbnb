@@ -7,6 +7,9 @@ import { isAuth } from './middleware/is-auth';
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
 import { User, updateUser, UpdateUserType } from './models/user';
+import { getBooking } from './models/booking';
+import { createPayment, executePayment } from './services/PayPalService';
+import bodyParser from 'body-parser';
 
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
@@ -18,9 +21,11 @@ const transporter = nodemailer.createTransport({
 
 const app: Application = express();
 app.use(isAuth);
+app.use(bodyParser.json());
 
-//app.use('/api', apiRouter);
-
+app.get('/', async (req, res) => {
+  res.send('success');
+});
 app.get('/confirmation/:token', async (req, res) => {
   let decodedToken: any;
   try {
@@ -35,6 +40,38 @@ app.get('/confirmation/:token', async (req, res) => {
   }
 
   return res.redirect('https://fathomless-refuge-61282.herokuapp.com/login');
+});
+
+app.post('/pay', async (req, res) => {
+  if (req.body.bookingId === undefined) {
+    return res.status(400).send({
+      message: 'Booking id is not defined'
+    });
+  }
+  let bookingId = req.body.bookingId;
+
+  //let bookingId = 'f2a2c884-04b0-4202-96d2-aac12ecc3693';
+  let booking = await getBooking(bookingId);
+
+  console.log(booking.confirmed);
+
+  if (booking.confirmed) {
+    return res.status(400).send({
+      message: 'booking is already confirmed'
+    });
+  }
+
+  createPayment(booking.listing, booking, res);
+});
+
+app.get('/success/:bookingId', async (req, res) => {
+  const payerId = req.query.PayerID;
+  const paymentID = req.query.paymentId;
+  const bookingId = req.params.bookingId;
+
+  let booking = await getBooking(bookingId);
+
+  executePayment(booking, payerId, paymentID, res);
 });
 
 const server = new ApolloServer({

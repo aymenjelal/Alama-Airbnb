@@ -38,12 +38,14 @@ import {
   addNewBooking,
   BookingType,
   getBookingByListingDate,
-  getBookingByUserDate
+  getBookingByUserDate,
+  getBooking
 } from './models/booking';
 import { Request } from 'express';
 import { val } from 'objection';
 import jwt from 'jsonwebtoken';
 import { sendConfirmationEmail } from './services/EmailService';
+import { createPayment } from './services/PayPalService';
 //require('dotenv').config();
 
 // interface NewUserType {

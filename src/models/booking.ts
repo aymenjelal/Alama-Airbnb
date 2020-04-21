@@ -10,6 +10,7 @@ export class Booking extends Model {
   id!: string;
   user!: User;
   listing!: Listing;
+  confirmed!: boolean;
   startBookDate!: Date;
   endBookDate!: Date;
   bookingDate!: Date;
@@ -41,6 +42,15 @@ export class Booking extends Model {
 }
 
 export interface BookingType {
+  user: User;
+  listing: Listing;
+  startBookDate: Date;
+  endBookDate: Date;
+  bookingDate: Date;
+}
+
+export interface UpdateBookingType {
+  id: string;
   user: User;
   listing: Listing;
   startBookDate: Date;
@@ -100,6 +110,14 @@ export const addNewBooking = async (booking: BookingType): Promise<Booking> => {
     .withGraphFetched('user');
 
   return newBooking;
+};
+
+export const getBooking = async (bookingId: string): Promise<Booking> => {
+  const booking: Booking = await Booking.query()
+    .findById(bookingId)
+    .withGraphFetched('listing')
+    .withGraphFetched('user');
+  return booking;
 };
 
 export const getBookingByListing = async (
@@ -177,6 +195,25 @@ export const deleteBookingByListing = async (
     .where('listings_id', listingId);
 
   return deletedBooking;
+};
+
+export const updateBooking = async (
+  booking: UpdateBookingType
+): Promise<Booking> => {
+  const existingBooking: Booking = await Booking.query().findById(booking.id);
+
+  if (!existingBooking) {
+    throw new Error('Booking doesnt exist');
+  }
+
+  const updatedBooking: Booking = await Booking.query().patchAndFetchById(
+    booking.id,
+    {
+      ...booking
+    }
+  );
+
+  return updatedBooking;
 };
 
 function daysBetween(second: Date, first: Date) {

@@ -6,8 +6,13 @@ export const types = `
         startBookDate: Date
         endBookDate: Date
         bookingDate: Date
+        confirmed: Boolean
         user: User
         listing: Listing
+    }
+
+    type ConfirmLink{
+        link: String
     }
 `;
 
@@ -26,6 +31,10 @@ export const inputs = `
 
     input BookingListingInput{
         id: String
+    }
+
+    input ConfirmBookingInput{
+        bookingId: String
     }
 
 `;
