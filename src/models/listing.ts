@@ -263,12 +263,22 @@ export const updateListing = async (
 export const searchListing = async (
   listingSearch: ListingSearchType
 ): Promise<Listing[]> => {
+  console.log(listingSearch.country);
+  if (listingSearch.city === undefined || listingSearch.country === undefined) {
+    throw new Error('Country or city seems to be null');
+  }
   const listings: Listing[] = await Listing.query()
     .skipUndefined()
-    .where('city', 'like', '%' + listingSearch.city + '%')
+    .whereRaw(
+      'LOWER(city) LIKE ?',
+      '%' + listingSearch.city.toLowerCase() + '%'
+    )
+    .whereRaw(
+      'LOWER(country) LIKE ?',
+      '%' + listingSearch.country.toLowerCase().toLowerCase() + '%'
+    )
     .where('price', '<=', listingSearch.price)
     .where('personCapacity', '>=', listingSearch.personCapacity)
-    .where('country', 'like', '%' + listingSearch.country + '%')
     .withGraphFetched('user')
     .withGraphFetched('reviews')
     .withGraphFetched('images')
