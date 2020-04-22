@@ -55,8 +55,6 @@ export const createPayment = (
     ]
   };
 
-  console.log(create_payment_json.transactions);
-
   paypal.payment.create(create_payment_json, function(
     error: paypal.SDKError,
     payment: any
