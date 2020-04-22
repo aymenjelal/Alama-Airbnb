@@ -20,14 +20,18 @@ export const createPayment = (
 
   let totalPrice = amountOfDays * listing.price;
 
+  const productionURL = 'https://alama-airbnb.herokuapp.com';
+  const developmentURL = 'http://localhost:4000';
+  const url = process.env.NODE_ENV ? productionURL : developmentURL;
+
   const create_payment_json = {
     intent: 'sale',
     payer: {
       payment_method: 'paypal'
     },
     redirect_urls: {
-      return_url: `http://localhost:4000/success/${booking.id}`,
-      cancel_url: 'http://localhost:4000/cancel'
+      return_url: `${url}/success/${booking.id}`,
+      cancel_url: `${url}/cancel`
     },
     transactions: [
       {
@@ -101,7 +105,7 @@ export const executePayment = (
       //console.log(JSON.stringify(payment));
       booking.confirmed = true;
       updateBooking(booking);
-      res.send('Success');
+      res.redirect('https://fathomless-refuge-61282.herokuapp.com/bookings');
     }
   });
 };
