@@ -10,6 +10,7 @@ import { User, updateUser, UpdateUserType } from './models/user';
 import { getBooking } from './models/booking';
 import { createPayment, executePayment } from './services/PayPalService';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
@@ -22,6 +23,7 @@ const transporter = nodemailer.createTransport({
 const app: Application = express();
 app.use(isAuth);
 app.use(bodyParser.json());
+app.use(cors());
 
 app.get('/', async (req, res) => {
   res.send('success');
@@ -52,8 +54,6 @@ app.post('/pay', async (req, res) => {
 
   //let bookingId = 'f2a2c884-04b0-4202-96d2-aac12ecc3693';
   let booking = await getBooking(bookingId);
-
-  console.log(booking.confirmed);
 
   if (booking.confirmed) {
     return res.status(400).send({
