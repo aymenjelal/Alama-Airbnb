@@ -50,7 +50,7 @@ export const createPayment = (
           currency: 'USD',
           total: totalPrice.toString()
         },
-        description: 'Payment for a booking'
+        description: 'Payment for a booking in Addis BnB'
       }
     ]
   };
