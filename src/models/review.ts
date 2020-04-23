@@ -72,7 +72,8 @@ export const getReviewbyListing = async (
   const reviews: Review[] = await Review.query()
     .where('listings_id', listingId)
     .withGraphFetched('user')
-    .withGraphFetched('listing');
+    .withGraphFetched('listing')
+    .orderBy('lastUpdatedAt', 'desc');
   return reviews;
 };
 

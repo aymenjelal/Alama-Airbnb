@@ -112,7 +112,8 @@ export const getAllUsers = async (): Promise<User[]> => {
   const users: User[] = await User.query()
     .withGraphFetched('listings')
     .withGraphFetched('reviews')
-    .withGraphFetched('bookings');
+    .withGraphFetched('bookings')
+    .orderBy('joinedDate', 'desc');
   return users;
 };
 

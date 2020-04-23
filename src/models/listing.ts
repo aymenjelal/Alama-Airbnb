@@ -149,7 +149,9 @@ export const getAllListings = async (): Promise<Listing[]> => {
     .withGraphFetched('images')
     .withGraphFetched('geolocations')
     .withGraphFetched('anemitys')
-    .withGraphFetched('bookings');
+    .withGraphFetched('bookings')
+    .orderBy('createdAt', 'desc');
+
   return listings;
 };
 
@@ -161,7 +163,8 @@ export const getActiveListings = async (): Promise<Listing[]> => {
     .withGraphFetched('images')
     .withGraphFetched('geolocations')
     .withGraphFetched('anemitys')
-    .withGraphFetched('bookings');
+    .withGraphFetched('bookings')
+    .orderBy('createdAt', 'desc');
   return listings;
 };
 
@@ -196,7 +199,8 @@ export const getListingByUser = async (userId: string): Promise<Listing[]> => {
     .withGraphFetched('images')
     .withGraphFetched('geolocations')
     .withGraphFetched('anemitys')
-    .withGraphFetched('bookings');
+    .withGraphFetched('bookings')
+    .orderBy('createdAt', 'desc');
 
   return listings;
 };
@@ -263,7 +267,6 @@ export const updateListing = async (
 export const searchListing = async (
   listingSearch: ListingSearchType
 ): Promise<Listing[]> => {
-  console.log(listingSearch.country);
   if (listingSearch.city === undefined || listingSearch.country === undefined) {
     throw new Error('Country or city seems to be null');
   }
@@ -284,7 +287,8 @@ export const searchListing = async (
     .withGraphFetched('images')
     .withGraphFetched('geolocations')
     .withGraphFetched('anemitys')
-    .withGraphFetched('bookings');
+    .withGraphFetched('bookings')
+    .orderBy('createdAt', 'desc');
 
   return listings;
 };
