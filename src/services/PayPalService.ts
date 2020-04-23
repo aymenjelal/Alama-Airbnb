@@ -1,7 +1,14 @@
 import paypal from 'paypal-rest-sdk';
-import { Listing } from '../models/listing';
-import { Booking, updateBooking } from '../models/booking';
+import { Listing, getListing } from '../models/listing';
+import {
+  Booking,
+  updateBooking,
+  getBooking,
+  getTodaysCheckins
+} from '../models/booking';
 import { Response } from 'express';
+import { User } from '../models/user';
+import dateFormat from 'dateformat';
 
 paypal.configure({
   mode: 'sandbox',
@@ -104,6 +111,114 @@ export const executePayment = (
       booking.confirmed = true;
       updateBooking(booking);
       res.redirect('https://fathomless-refuge-61282.herokuapp.com/bookings');
+    }
+  });
+};
+
+export const createPayouts = async () => {
+  console.log('in create payouts');
+  //let bookingId = 'f2a2c884-04b0-4202-96d2-aac12ecc3693';
+
+  let bookings: Booking[] = await getTodaysCheckins();
+
+  bookings.forEach(async booking => {
+    await createPayout(booking);
+    booking.paid = true;
+    await updateBooking(booking);
+  });
+};
+
+const createPayout = async (booking: Booking) => {
+  let listing: Listing = await getListing(booking.listing.id);
+  let user: User = listing.user;
+
+  const amountOfDays = daysBetween(booking.endBookDate, booking.startBookDate);
+
+  let totalPayout =
+    amountOfDays * listing.price - amountOfDays * listing.price * 0.1;
+
+  var sender_batch_id = Math.random()
+    .toString(36)
+    .substring(9);
+
+  var create_payout_json = {
+    sender_batch_header: {
+      sender_batch_id: sender_batch_id,
+      email_subject: 'You have a payment'
+    },
+    items: [
+      {
+        recipient_type: 'EMAIL',
+        amount: {
+          value: totalPayout,
+          currency: 'USD'
+        },
+        receiver: user.paypalAccount,
+        note: `Payment for your ${listing.name} listing `,
+        sender_item_id: booking.id.toString()
+      }
+    ]
+  };
+
+  var sync_mode = 'flase';
+
+  paypal.payout.create(create_payout_json, sync_mode, function(
+    error: { response: any },
+    payout: any
+  ) {
+    if (error) {
+      console.log(error.response);
+      throw error;
+    } else {
+      console.log('Create Single Payout Response');
+      console.log(payout);
+    }
+  });
+};
+
+export const createCancelationPayout = async (booking: Booking) => {
+  let listing: Listing = await getListing(booking.listing.id);
+  let user: User = booking.user;
+
+  const amountOfDays = daysBetween(booking.endBookDate, booking.startBookDate);
+
+  let totalPayout = amountOfDays * listing.price - listing.price;
+
+  var sender_batch_id = Math.random()
+    .toString(36)
+    .substring(9);
+
+  var create_payout_json = {
+    sender_batch_header: {
+      sender_batch_id: sender_batch_id,
+      email_subject: 'You have a payment for cancelation'
+    },
+    items: [
+      {
+        recipient_type: 'EMAIL',
+        amount: {
+          value: totalPayout,
+          currency: 'USD'
+        },
+        receiver: user.paypalAccount,
+        note: `Payment for your ${listing.name} cancelation `,
+        sender_item_id: booking.id.toString()
+      }
+    ]
+  };
+
+  var sync_mode = 'flase';
+
+  paypal.payout.create(create_payout_json, sync_mode, function(
+    error: { response: any },
+    payout: any
+  ) {
+    if (error) {
+      console.log(error.response);
+      throw error;
+    } else {
+      console.log('Create Single Payout Response');
+      console.log(payout);
     }
   });
 };

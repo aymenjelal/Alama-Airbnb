@@ -11,6 +11,7 @@ export class Booking extends Model {
   user!: User;
   listing!: Listing;
   confirmed!: boolean;
+  paid!: boolean;
   startBookDate!: Date;
   endBookDate!: Date;
   bookingDate!: Date;
@@ -161,8 +162,6 @@ export const getBookingByUserDate = async (
   const newStartDate = new Date('2020-04-12');
   const newEndDate = new Date('2020-04-16');
 
-  console.log(newStartDate.getTime);
-  console.log(newEndDate.getTime);
   const booking: Booking = await Booking.query()
     .where('users_id', userId)
     .where('endBookDate', '>=', startDate)
@@ -172,7 +171,16 @@ export const getBookingByUserDate = async (
 
   return booking;
 };
+export const getTodaysCheckins = async (): Promise<Booking[]> => {
+  const today = dateFormat(new Date(), 'yyyy-mm-dd');
+  const bookings: Booking[] = await Booking.query()
+    .where('startBookDate', '=', today)
+    .where('paid', false)
+    .withGraphFetched('listing')
+    .withGraphFetched('user');
 
+  return bookings;
+};
 export const getFutureBookingByListing = async (
   listingId: string
 ): Promise<Booking[]> => {
@@ -197,6 +205,22 @@ export const deleteBookingByListing = async (
   return deletedBooking;
 };
 
+export const cancelBooking = async (booking: Booking): Promise<Number> => {
+  const today = new Date();
+
+  if (!booking.confirmed) {
+    throw new Error('Booking cant be canceled for unconfirmed booking');
+  }
+  const dateDifference = daysBetween(booking.startBookDate, today);
+
+  if (dateDifference <= 1) {
+    throw new Error('Booking cant be cancled a day or less before start date');
+  }
+  const cancledBooking: number = await Booking.query().deleteById(booking.id);
+
+  return cancledBooking;
+};
+
 export const updateBooking = async (
   booking: UpdateBookingType
 ): Promise<Booking> => {
@@ -214,6 +238,19 @@ export const updateBooking = async (
   );
 
   return updatedBooking;
+};
+
+export const checkConfirmation = async () => {
+  let bookings: Booking[] = await Booking.query().where('confirmed', false);
+  let today = new Date();
+  bookings.forEach(async booking => {
+    let hours =
+      Math.abs(today.getTime() - booking.bookingDate.getTime()) / 3600000;
+
+    if (hours >= 1) {
+      await Booking.query().deleteById(booking.id);
+    }
+  });
 };
 
 function daysBetween(second: Date, first: Date) {

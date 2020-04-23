@@ -7,10 +7,15 @@ import { isAuth } from './middleware/is-auth';
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
 import { User, updateUser, UpdateUserType } from './models/user';
-import { getBooking } from './models/booking';
-import { createPayment, executePayment } from './services/PayPalService';
+import { getBooking, checkConfirmation } from './models/booking';
+import {
+  createPayment,
+  executePayment,
+  createPayouts
+} from './services/PayPalService';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import cron from 'node-cron';
 
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
@@ -20,14 +25,23 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+//declare app
 const app: Application = express();
 app.use(isAuth);
 app.use(bodyParser.json());
 app.use(cors());
 
-app.get('/', async (req, res) => {
-  res.send('success');
+//Corn Scheduler for payouts
+cron.schedule('0 18 * * *', function() {
+  createPayouts();
 });
+
+cron.schedule('0,29 * * * *', function() {
+  console.log('second cron');
+  checkConfirmation();
+});
+
+//route for confirmation email
 app.get('/confirmation/:token', async (req, res) => {
   let decodedToken: any;
   try {
@@ -44,6 +58,7 @@ app.get('/confirmation/:token', async (req, res) => {
   return res.redirect('https://fathomless-refuge-61282.herokuapp.com/login');
 });
 
+//route for paypal post
 app.post('/pay', async (req, res) => {
   if (req.body.bookingId === undefined) {
     return res.status(400).send({
@@ -64,6 +79,7 @@ app.post('/pay', async (req, res) => {
   createPayment(booking.listing, booking, res);
 });
 
+//route for paypal success
 app.get('/success/:bookingId', async (req, res) => {
   const payerId = req.query.PayerID;
   const paymentID = req.query.paymentId;
@@ -82,12 +98,6 @@ const server = new ApolloServer({
   playground: true
 });
 
-const EMAIL_SECRET = 'asdf1093KMnzxcvnkljvasdu09123nlasdasdf';
-
 server.applyMiddleware({ app });
 
 app.listen(process.env.PORT || 4000, () => console.log(`server ready `));
-
-//console.log(process.env.DATABASE);
-
-//app.listen(5000, () => console.log('server running'));

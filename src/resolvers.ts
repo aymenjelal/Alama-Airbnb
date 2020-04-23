@@ -39,13 +39,17 @@ import {
   BookingType,
   getBookingByListingDate,
   getBookingByUserDate,
-  getBooking
+  getBooking,
+  cancelBooking
 } from './models/booking';
 import { Request } from 'express';
 import { val } from 'objection';
 import jwt from 'jsonwebtoken';
 import { sendConfirmationEmail } from './services/EmailService';
-import { createPayment } from './services/PayPalService';
+import {
+  createPayment,
+  createCancelationPayout
+} from './services/PayPalService';
 //require('dotenv').config();
 
 // interface NewUserType {
@@ -263,6 +267,30 @@ export const resolvers: IResolvers = {
       let newBooking = await addNewBooking(booking);
 
       return newBooking;
+    },
+
+    cancelBooking: async (_, { input }, context) => {
+      if (!context.req.isAuth) {
+        throw new Error('Unathenticated!!');
+      }
+
+      let booking = await getBooking(input.id);
+
+      if (!booking) {
+        throw new Error('Booking doesnt exist');
+      }
+
+      if (context.req.userId != booking.user.id) {
+        throw new Error('Authenticated user is not the same as booking owner');
+      }
+
+      let canceledBooking = await cancelBooking(booking);
+
+      await createCancelationPayout(booking);
+
+      return {
+        deleted: canceledBooking
+      };
     }
   }
 };

@@ -25,6 +25,10 @@ export const inputs = `
         listing: BookingListingInput
     }
 
+    input CancelBookingInput{
+        id: String
+    }
+
     input BookingUserInput{
         id: String
       }
@@ -51,4 +55,5 @@ export const queries = `
 export const mutations = `
 
     addBooking (input: NewBookingInput): Booking!
+    cancelBooking(input: CancelBookingInput): deletedNumber!
 `;

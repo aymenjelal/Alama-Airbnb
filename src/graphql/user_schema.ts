@@ -11,6 +11,7 @@ export const types = `
     street: String
     phone: String
     language: String
+    paypalAccount: String
     ishost: Boolean
     confirmed: Boolean
     joinedDate: Date
@@ -54,6 +55,7 @@ export const inputs = `
       language: String
       ishost: Boolean
       password: String
+      paypalAccount: String
   }
 `;
 

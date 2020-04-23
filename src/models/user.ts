@@ -22,6 +22,7 @@ export class User extends Model {
   ishost!: boolean;
   confirmed!: boolean;
   password!: string;
+  paypalAccount!: string;
   joinedDate!: Date;
 
   static get tableName(): string {
