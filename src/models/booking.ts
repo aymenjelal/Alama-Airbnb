@@ -98,7 +98,8 @@ export const addNewBooking = async (booking: BookingType): Promise<Booking> => {
   //check for existing bookings for the user
   let existingUserBooking = await getBookingByUserDate(
     booking.user.id,
-    booking.startBookDate
+    booking.startBookDate,
+    booking.endBookDate
   );
   if (existingUserBooking) {
     throw new Error('Booking at start date exists for user');
@@ -150,7 +151,7 @@ export const getBookingByListingDate = async (
   const booking: Booking = await Booking.query()
     .where('listings_id', listingId)
     .where('endBookDate', '>=', startDate)
-    .where('startBookDate', '<', endDate)
+    .where('startBookDate', '<=', endDate)
     .first()
     .withGraphFetched('listing')
     .withGraphFetched('user');
@@ -171,11 +172,13 @@ export const getBookingByUser = async (userId: string): Promise<Booking[]> => {
 //function to get booking by user and start date
 export const getBookingByUserDate = async (
   userId: string,
-  startDate: Date
+  startDate: Date,
+  endDate: Date
 ): Promise<Booking> => {
   const booking: Booking = await Booking.query()
     .where('users_id', userId)
     .where('endBookDate', '>=', startDate)
+    .where('startBookDate', '<', endDate)
     .first()
     .withGraphFetched('listing')
     .withGraphFetched('user');

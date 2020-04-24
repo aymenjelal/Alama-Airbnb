@@ -68,7 +68,7 @@ export const resolvers: IResolvers = {
       getBookingByListingDate(id, start, end),
     bookingByUser: async (_, { id }) => getBookingByUser(id),
     bookingByUserDate: async (_, { id, start, end }) =>
-      getBookingByUserDate(id, start)
+      getBookingByUserDate(id, start, end)
   },
 
   Date: new GraphQLScalarType({
@@ -213,7 +213,7 @@ export const resolvers: IResolvers = {
     },
 
     addBooking: async (_, { input }, context) => {
-      if (!context.req.isAuth) {
+      if (context.req.isAuth) {
         throw new Error('Unauthenticated!!');
       }
 
