@@ -213,7 +213,7 @@ export const resolvers: IResolvers = {
     },
 
     addBooking: async (_, { input }, context) => {
-      if (context.req.isAuth) {
+      if (!context.req.isAuth) {
         throw new Error('Unauthenticated!!');
       }
 
