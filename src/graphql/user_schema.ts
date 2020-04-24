@@ -11,14 +11,23 @@ export const types = `
     street: String
     phone: String
     language: String
+    paypalAccount: String
     ishost: Boolean
-    password: String
+    confirmed: Boolean
     joinedDate: Date
     listings: [Listing]
+    reviews: [Review]
+    bookings: [Booking]
   }
 
   type deletedNumber{
     deleted: Int
+  }
+
+  type AuthData{
+    userId: String!
+    token: String!
+    tokenExpiration: Int!
   }
 `;
 
@@ -46,12 +55,14 @@ export const inputs = `
       language: String
       ishost: Boolean
       password: String
+      paypalAccount: String
   }
 `;
 
 export const queries = `
     users: [User]
     user(id: String): User
+    login(email:String!, password: String!): AuthData!
 `;
 
 export const mutations = `

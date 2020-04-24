@@ -13,10 +13,13 @@ export const types = `
     personCapacity: Int
     houseType: String
     rating: Float
+    status: String
+    user: User
     reviews: [Review]
     images: [Image]
     geolocations: [Geolocation]
     anemitys: [Anemity]
+    bookings: [Booking]
     createdAt: Date
   }
 `;
@@ -85,23 +88,44 @@ export const inputs = `
     personCapacity: Int
     houseType: String
     rating: Float
+    status: String
     user: ListingUserInput
     images: [UpdateImageInput]
     anemitys: [UpdateAnemityInput]
     geolocations: [UpdateGeolocationInput]
   }
+
+  input ListingFilterInput{
+    country: ListingStringFilterInput
+    city: ListingStringFilterInput
+  }
+
+  input ListingStringFilterInput{
+    contains : String
+  }
+
+  input SearchListingsInput{
+    city: String
+    country: String
+    price: Float
+    personCapacity: Int
+  }
   
 `;
 
 export const queries = `
-  listings: [Listing]
+  allListings: [Listing]
+  activeListings: [Listing]
   listing(id: String): Listing 
+  listingByUser(id:String): [Listing]
+  searchListing(input: SearchListingsInput): [Listing]
 `;
 
 export const mutations = `
 
   addNewListing(input: NewListingInput): Listing!
   updateListing(input: UpdateListingInput): Listing!
+  deleteListing(input: String): deletedNumber!
 
 
 `;
