@@ -1,6 +1,5 @@
 import { Model } from 'objection';
 import { User } from './user';
-import { OccupiedDate } from './knex_schema';
 import { gql } from 'apollo-server-express';
 import { Review } from './review';
 import { ListingImage } from './image';
@@ -75,14 +74,6 @@ export class Listing extends Model {
           to: 'images.listings_id'
         }
       },
-      occupiedDates: {
-        relation: Model.HasManyRelation,
-        modelClass: OccupiedDate,
-        join: {
-          from: 'listings.id',
-          to: 'occupied_dates.listings_id'
-        }
-      },
       anemitys: {
         relation: Model.HasManyRelation,
         modelClass: Anemity,
@@ -142,7 +133,9 @@ export interface NewListingType {
   createdAt: Date;
 }
 
+//function to get all listing
 export const getAllListings = async (): Promise<Listing[]> => {
+  //get all listings from database
   const listings: Listing[] = await Listing.query()
     .withGraphFetched('user')
     .withGraphFetched('reviews')
@@ -155,6 +148,7 @@ export const getAllListings = async (): Promise<Listing[]> => {
   return listings;
 };
 
+//function to get all active listings
 export const getActiveListings = async (): Promise<Listing[]> => {
   const listings: Listing[] = await Listing.query()
     .where('status', 'active')
@@ -168,6 +162,7 @@ export const getActiveListings = async (): Promise<Listing[]> => {
   return listings;
 };
 
+//function to get a listing by Id
 export const getListing = async (listingId: string): Promise<Listing> => {
   const listing: Listing = await Listing.query()
     .findById(listingId)
@@ -181,6 +176,7 @@ export const getListing = async (listingId: string): Promise<Listing> => {
   return listing;
 };
 
+//fuction to get a listing by Id and userId
 export const getListingByIdAndUser = async (
   listingId: string,
   userId: string
@@ -192,6 +188,7 @@ export const getListingByIdAndUser = async (
   return listing;
 };
 
+//function to get user listings
 export const getListingByUser = async (userId: string): Promise<Listing[]> => {
   const listings: Listing[] = await Listing.query()
     .where('users_id', userId)
@@ -205,9 +202,13 @@ export const getListingByUser = async (userId: string): Promise<Listing[]> => {
   return listings;
 };
 
+//function to add listing
 export const addListing = async (listing: NewListingType): Promise<Listing> => {
+  //set created at and status for new listing
   listing.createdAt = new Date();
   listing.status = 'active';
+
+  //create and fetch new listing
   const newListing: Listing = await Listing.query()
     .insertGraph(
       {
@@ -227,24 +228,29 @@ export const addListing = async (listing: NewListingType): Promise<Listing> => {
   return newListing;
 };
 
+//function to update listing
 export const updateListing = async (
   listing: Listing,
   userId: string
 ): Promise<Listing> => {
+  //check if listing exists
   let checkListing = await getListingByIdAndUser(listing.id, userId);
-
   if (!checkListing) {
     throw new Error('Listing doesnt exist for the user');
   }
 
+  //get future bookings for listing
   let listingBookings = await getFutureBookingByListing(listing.id);
 
+  //get original listing
   let originalListing = await getListing(listing.id);
 
+  //send emails of original listing to booking users
   listingBookings.forEach(booking => {
     sendUpdateListingEmail(booking.user, originalListing);
   });
 
+  //update listing in database
   const updatedListing: Listing = await Listing.query()
     .upsertGraphAndFetch(
       {
@@ -264,12 +270,16 @@ export const updateListing = async (
   return updatedListing;
 };
 
+//function to search listing
 export const searchListing = async (
   listingSearch: ListingSearchType
 ): Promise<Listing[]> => {
+  //check if search parameters are defined
   if (listingSearch.city === undefined || listingSearch.country === undefined) {
     throw new Error('Country or city seems to be null');
   }
+
+  //get listing with search parameters from database
   const listings: Listing[] = await Listing.query()
     .skipUndefined()
     .whereRaw(
@@ -293,18 +303,19 @@ export const searchListing = async (
   return listings;
 };
 
+//function to delete listing
 export const deleteListing = async (
   listingId: string,
   userId: string
 ): Promise<Number> => {
+  //check if listing exists
   let checkListing = await getListingByIdAndUser(listingId, userId);
-
   if (!checkListing) {
     throw new Error('Listing doesnt exist for the user');
   }
 
+  //check if future bookings exists
   let futureBooking = await getFutureBookingByListing(listingId);
-
   if (futureBooking.length != 0) {
     throw new Error('bookings exist for the listing, cant be deleted');
   }

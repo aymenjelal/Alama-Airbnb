@@ -52,30 +52,6 @@ import {
 } from './services/PayPalService';
 //require('dotenv').config();
 
-// interface NewUserType {
-//   firstName: string;
-//   lastName: string;
-//   email: string;
-//   country: string;
-//   street: string;
-//   phone: string;
-//   language: string;
-//   ishost: boolean;
-//   password: string;
-// }
-
-// const registerUser = async (user: NewUserType) => {
-//   const registeredUser: User = await User.query().insert({
-//     ...user
-//   });
-
-//   return registeredUser;
-// };
-
-// const getAllUsers = async () => {
-//   const users = await User.query().withGraphFetched('listings');
-//   return users;
-// };
 export const resolvers: IResolvers = {
   Query: {
     users: async () => getAllUsers(),
@@ -89,7 +65,7 @@ export const resolvers: IResolvers = {
     reviewByListing: async (_, { id }) => getReviewbyListing(id),
     bookingByListing: async (_, { id }) => getBookingByListing(id),
     bookingByListingDate: async (_, { id, start, end }) =>
-      getBookingByListingDate(id, start),
+      getBookingByListingDate(id, start, end),
     bookingByUser: async (_, { id }) => getBookingByUser(id),
     bookingByUserDate: async (_, { id, start, end }) =>
       getBookingByUserDate(id, start)
@@ -123,26 +99,8 @@ export const resolvers: IResolvers = {
       };
       let registeredUser = await registerUser(newUser);
 
+      //email confirmation links
       sendConfirmationEmail(registeredUser);
-
-      // jwt.sign(
-      //   {
-      //     user: registeredUser.id,
-      //   },
-      //   EMAIL_SECRET,
-      //   {
-      //     expiresIn: '1d',
-      //   },
-      //   (err, emailToken) => {
-      //     const url = `http://localhost:3000/confirmation/${emailToken}`;
-
-      //     transporter.sendMail({
-      //       to: newUser.email,
-      //       subject: 'Confirm Email',
-      //       html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`,
-      //     });
-      //   },
-      // );
 
       return registeredUser;
     },
@@ -255,8 +213,7 @@ export const resolvers: IResolvers = {
     },
 
     addBooking: async (_, { input }, context) => {
-      //console.log(input.startBookDate);
-      if (!context.req.isAuth) {
+      if (context.req.isAuth) {
         throw new Error('Unauthenticated!!');
       }
 
@@ -284,8 +241,10 @@ export const resolvers: IResolvers = {
         throw new Error('Authenticated user is not the same as booking owner');
       }
 
+      //try to cancel booking
       let canceledBooking = await cancelBooking(booking);
 
+      //send payout if booking can be canceled
       await createCancelationPayout(booking);
 
       return {

@@ -59,6 +59,7 @@ export interface UpdateBookingType {
   bookingDate: Date;
 }
 
+//function to add a new booking
 export const addNewBooking = async (booking: BookingType): Promise<Booking> => {
   booking.bookingDate = new Date();
 
@@ -68,6 +69,7 @@ export const addNewBooking = async (booking: BookingType): Promise<Booking> => {
 
   let bookingListing = await getListing(booking.listing.id);
 
+  //check booking date constraints
   if (daysBetween(newBookingEnd, newBookingStart) < 1) {
     throw new Error('booking dates are less than a day');
   } else if (daysBetween(newBookingStart, new Date()) < 1) {
@@ -76,20 +78,24 @@ export const addNewBooking = async (booking: BookingType): Promise<Booking> => {
     throw new Error('booking cant be for more than 15 days ');
   }
 
+  //check if listing exists
   if (!bookingListing) {
     throw new Error('listing doesnt exist');
   } else if (bookingListing.user.id === booking.user.id) {
     throw new Error('Users cant book their own listing');
   }
 
+  //check for existing bookings at start date
   let existingListingBooking = await getBookingByListingDate(
     booking.listing.id,
-    booking.startBookDate
+    booking.startBookDate,
+    booking.endBookDate
   );
   if (existingListingBooking) {
     throw new Error('Booking existing for the listing at the start date');
   }
 
+  //check for existing bookings for the user
   let existingUserBooking = await getBookingByUserDate(
     booking.user.id,
     booking.startBookDate
@@ -98,6 +104,7 @@ export const addNewBooking = async (booking: BookingType): Promise<Booking> => {
     throw new Error('Booking at start date exists for user');
   }
 
+  //add new booking to database
   const newBooking: Booking = await Booking.query()
     .insertGraph(
       {
@@ -113,6 +120,7 @@ export const addNewBooking = async (booking: BookingType): Promise<Booking> => {
   return newBooking;
 };
 
+//function to get a booking by Id
 export const getBooking = async (bookingId: string): Promise<Booking> => {
   const booking: Booking = await Booking.query()
     .findById(bookingId)
@@ -121,6 +129,7 @@ export const getBooking = async (bookingId: string): Promise<Booking> => {
   return booking;
 };
 
+//fuction to get a booking by listing
 export const getBookingByListing = async (
   listingId: string
 ): Promise<Booking[]> => {
@@ -132,13 +141,16 @@ export const getBookingByListing = async (
   return booking;
 };
 
+//function to get booking by listing and start date
 export const getBookingByListingDate = async (
   listingId: string,
-  startDate: Date
+  startDate: Date,
+  endDate: Date
 ): Promise<Booking> => {
   const booking: Booking = await Booking.query()
     .where('listings_id', listingId)
     .where('endBookDate', '>=', startDate)
+    .where('startBookDate', '<', endDate)
     .first()
     .withGraphFetched('listing')
     .withGraphFetched('user');
@@ -146,6 +158,7 @@ export const getBookingByListingDate = async (
   return booking;
 };
 
+//function to get booking for user
 export const getBookingByUser = async (userId: string): Promise<Booking[]> => {
   const bookings: Booking[] = await Booking.query()
     .where('users_id', userId)
@@ -155,13 +168,11 @@ export const getBookingByUser = async (userId: string): Promise<Booking[]> => {
   return bookings;
 };
 
+//function to get booking by user and start date
 export const getBookingByUserDate = async (
   userId: string,
   startDate: Date
 ): Promise<Booking> => {
-  const newStartDate = new Date('2020-04-12');
-  const newEndDate = new Date('2020-04-16');
-
   const booking: Booking = await Booking.query()
     .where('users_id', userId)
     .where('endBookDate', '>=', startDate)
@@ -171,6 +182,8 @@ export const getBookingByUserDate = async (
 
   return booking;
 };
+
+//function to get bookings with start date the same as current date
 export const getTodaysCheckins = async (): Promise<Booking[]> => {
   const today = dateFormat(new Date(), 'yyyy-mm-dd');
   const bookings: Booking[] = await Booking.query()
@@ -181,6 +194,8 @@ export const getTodaysCheckins = async (): Promise<Booking[]> => {
 
   return bookings;
 };
+
+//function to get future bookings for a listing
 export const getFutureBookingByListing = async (
   listingId: string
 ): Promise<Booking[]> => {
@@ -195,6 +210,7 @@ export const getFutureBookingByListing = async (
   return futureBookings;
 };
 
+//function to delete booking
 export const deleteBookingByListing = async (
   listingId: string
 ): Promise<Number> => {
@@ -205,22 +221,28 @@ export const deleteBookingByListing = async (
   return deletedBooking;
 };
 
+//function to cancel booking
 export const cancelBooking = async (booking: Booking): Promise<Number> => {
   const today = new Date();
 
+  //check if booking was confirmed
   if (!booking.confirmed) {
     throw new Error('Booking cant be canceled for unconfirmed booking');
   }
-  const dateDifference = daysBetween(booking.startBookDate, today);
 
+  //check the amount of days before start date
+  const dateDifference = daysBetween(booking.startBookDate, today);
   if (dateDifference <= 1) {
     throw new Error('Booking cant be cancled a day or less before start date');
   }
+
+  //cancel booking
   const cancledBooking: number = await Booking.query().deleteById(booking.id);
 
   return cancledBooking;
 };
 
+//function to update booking
 export const updateBooking = async (
   booking: UpdateBookingType
 ): Promise<Booking> => {
@@ -240,9 +262,13 @@ export const updateBooking = async (
   return updatedBooking;
 };
 
+//function to delete booking that have not been confirmed
 export const checkConfirmation = async () => {
+  //get bookings that are not confirmed
   let bookings: Booking[] = await Booking.query().where('confirmed', false);
   let today = new Date();
+
+  //delete bookings that hav not been confirmed in an hour
   bookings.forEach(async booking => {
     let hours =
       Math.abs(today.getTime() - booking.bookingDate.getTime()) / 3600000;

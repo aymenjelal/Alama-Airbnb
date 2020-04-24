@@ -18,19 +18,23 @@ paypal.configure({
     'EIU87KzlxKc6OzAwqaYn00vdvF47WKdL5e807h-y_wCoA4K7kfuxdR57OAxbxxjQu1uF_wWU_BZhz28M'
 });
 
+//function to create payment for booking confirmation
 export const createPayment = (
   listing: Listing,
   booking: Booking,
   res: Response
 ) => {
+  //calculate total payout
   const amountOfDays = daysBetween(booking.endBookDate, booking.startBookDate);
 
   let totalPrice = amountOfDays * listing.price;
 
+  //pick url
   const productionURL = 'https://alama-airbnb.herokuapp.com';
   const developmentURL = 'http://localhost:4000';
   const url = process.env.NODE_ENV ? productionURL : developmentURL;
 
+  //create payment json
   const create_payment_json = {
     intent: 'sale',
     payer: {
@@ -62,6 +66,7 @@ export const createPayment = (
     ]
   };
 
+  //send approval link for response
   paypal.payment.create(create_payment_json, function(
     error: paypal.SDKError,
     payment: any
@@ -78,6 +83,7 @@ export const createPayment = (
   });
 };
 
+//function to execute payment
 export const executePayment = (
   booking: Booking,
   payerId: any,
@@ -115,12 +121,12 @@ export const executePayment = (
   });
 };
 
+//function to create payouts for listing owners
 export const createPayouts = async () => {
-  console.log('in create payouts');
-  //let bookingId = 'f2a2c884-04b0-4202-96d2-aac12ecc3693';
-
+  //get bookings with start days the same as today
   let bookings: Booking[] = await getTodaysCheckins();
 
+  //create pyout for each booking and update booking
   bookings.forEach(async booking => {
     await createPayout(booking);
     booking.paid = true;
@@ -128,10 +134,12 @@ export const createPayouts = async () => {
   });
 };
 
+//function to create a single payout for a listing
 const createPayout = async (booking: Booking) => {
   let listing: Listing = await getListing(booking.listing.id);
   let user: User = listing.user;
 
+  //calculate total payout
   const amountOfDays = daysBetween(booking.endBookDate, booking.startBookDate);
 
   let totalPayout =
@@ -141,6 +149,7 @@ const createPayout = async (booking: Booking) => {
     .toString(36)
     .substring(9);
 
+  //create payout json
   var create_payout_json = {
     sender_batch_header: {
       sender_batch_id: sender_batch_id,
@@ -176,10 +185,12 @@ const createPayout = async (booking: Booking) => {
   });
 };
 
+//function to create cancelation payout
 export const createCancelationPayout = async (booking: Booking) => {
   let listing: Listing = await getListing(booking.listing.id);
   let user: User = booking.user;
 
+  //calculat total amount by substracting an single nights price
   const amountOfDays = daysBetween(booking.endBookDate, booking.startBookDate);
 
   let totalPayout = amountOfDays * listing.price - listing.price;
@@ -188,6 +199,7 @@ export const createCancelationPayout = async (booking: Booking) => {
     .toString(36)
     .substring(9);
 
+  // create payout json
   var create_payout_json = {
     sender_batch_header: {
       sender_batch_id: sender_batch_id,

@@ -16,6 +16,7 @@ oauth2Client.setCredentials({
     '1//04tfgZpaDjq2MCgYIARAAGAQSNwF-L9IryTc1QkRT131141c3GJbgmfRF6WLlG5NKBezPUBxT8NtY80SIUaRs4f4zpRXe1ci2wCQ'
 });
 
+//create nodemailer for transport
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth: {
@@ -29,19 +30,8 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// const smtpTransport = nodemailer.createTransport({
-//   service: 'Gmail',
-//   auth: {
-//     type: 'OAuth2',
-//     user: 'your.gmail.here@gmail.com',
-//     clientId: 'Your ClientID Here',
-//     clientSecret: 'Your Client Secret Here',
-//     refreshToken: 'Your Refresh Token Here',
-//     accessToken: accessToken
-//   }
-// });
-
 export const sendConfirmationEmail = (user: User) => {
+  //create email token
   const emailToken = jwt.sign(
     {
       user: user
@@ -49,10 +39,13 @@ export const sendConfirmationEmail = (user: User) => {
     'topsecret'
   );
 
+  //pick url
   const productionURL = 'https://alama-airbnb.herokuapp.com';
   const developmentURL = 'http://localhost:4000';
   const url = process.env.NODE_ENV ? productionURL : developmentURL;
   const confirmURL = `${url}/confirmation/${emailToken}`;
+
+  //use the transporter to send confirmation email
   transporter
     .sendMail({
       to: user.email,
@@ -67,6 +60,7 @@ export const sendConfirmationEmail = (user: User) => {
     });
 };
 
+//send listing updated email
 export const sendUpdateListingEmail = (user: User, listing: Listing) => {
   transporter
     .sendMail({

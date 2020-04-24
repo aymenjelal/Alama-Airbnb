@@ -47,10 +47,13 @@ export interface ReviewType {
   lastUpdatedAt: Date;
 }
 
+//function to add new review
 export const addNewReview = async (review: ReviewType): Promise<Review> => {
+  //set createdAt and lastUpdatedAt for new review
   review.createdAt = new Date();
   review.lastUpdatedAt = new Date();
 
+  //create new review in database
   const newReview: Review = await Review.query()
     .insertGraph(
       {
@@ -66,6 +69,7 @@ export const addNewReview = async (review: ReviewType): Promise<Review> => {
   return newReview;
 };
 
+//function to get reviews for a listing
 export const getReviewbyListing = async (
   listingId: string
 ): Promise<Review[]> => {
@@ -77,8 +81,12 @@ export const getReviewbyListing = async (
   return reviews;
 };
 
+//function to update review
 export const updateReview = async (review: Review): Promise<Review> => {
+  //set review last updated date
   review.lastUpdatedAt = new Date();
+
+  //update review in the database
   const updatedReview: Review = await Review.query()
     .patchAndFetchById(review.id, {
       ...review
@@ -89,6 +97,7 @@ export const updateReview = async (review: Review): Promise<Review> => {
   return updatedReview;
 };
 
+//function to delete review by Id
 export const deleteReview = async (reviewId: string): Promise<Number> => {
   const deletedReview: number = await Review.query().deleteById(reviewId);
   return deletedReview;
