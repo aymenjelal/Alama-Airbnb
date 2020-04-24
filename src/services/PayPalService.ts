@@ -8,14 +8,13 @@ import {
 } from '../models/booking';
 import { Response } from 'express';
 import { User } from '../models/user';
+require('dotenv').config();
 import dateFormat from 'dateformat';
 
 paypal.configure({
   mode: 'sandbox',
-  client_id:
-    'AQQNCR2R1RhY4t_PtGCVB-4edklQC4iTStUOHrszdIcvjZqFeVCG0gv8vK7Pp6b7ffxnOfJ7-VfUDnDO',
-  client_secret:
-    'EIU87KzlxKc6OzAwqaYn00vdvF47WKdL5e807h-y_wCoA4K7kfuxdR57OAxbxxjQu1uF_wWU_BZhz28M'
+  client_id: process.env.PAYPAL_CLIENT_ID!,
+  client_secret: process.env.PAYPAL_CLIENT_SECRET!
 });
 
 //function to create payment for booking confirmation

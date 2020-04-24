@@ -6,8 +6,8 @@ import { Listing } from '../models/listing';
 require('dotenv').config();
 
 const oauth2Client = new OAuth2Client(
-  '398163420113-kl9bqrgh28rih6nqjmd5j1g47vodtvud.apps.googleusercontent.com',
-  'cVuLYpfEgIX3ZaqpWKnSbM0T',
+  process.env.EMAIL_CLIENT_ID,
+  process.env.EMAIL_CLIENT_SECRET,
   'https://developers.google.com/oauthplayground'
 );
 
@@ -21,12 +21,10 @@ const transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth: {
     type: 'OAuth2',
-    user: 'aymen2jelal@gmail.com',
-    clientId:
-      '398163420113-kl9bqrgh28rih6nqjmd5j1g47vodtvud.apps.googleusercontent.com',
-    clientSecret: 'cVuLYpfEgIX3ZaqpWKnSbM0T',
-    refreshToken:
-      '1//04tfgZpaDjq2MCgYIARAAGAQSNwF-L9IryTc1QkRT131141c3GJbgmfRF6WLlG5NKBezPUBxT8NtY80SIUaRs4f4zpRXe1ci2wCQ'
+    user: process.env.EMAIL,
+    clientId: process.env.EMAIL_CLIENT_ID,
+    clientSecret: process.env.EMAIL_CLIENT_SECRET,
+    refreshToken: process.env.EMAIL_REFRESH_TOKEN
   }
 });
 

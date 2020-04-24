@@ -37,7 +37,6 @@ cron.schedule('0 18 * * *', function() {
 });
 
 cron.schedule('0,29 * * * *', function() {
-  console.log('second cron');
   checkConfirmation();
 });
 
