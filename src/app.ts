@@ -17,14 +17,6 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import cron from 'node-cron';
 
-const transporter = nodemailer.createTransport({
-  service: 'Gmail',
-  auth: {
-    user: 'aymen2jelal@gmail.com',
-    pass: 'Davidwestside1'
-  }
-});
-
 //declare app
 const app: Application = express();
 app.use(isAuth);
