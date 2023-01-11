@@ -31,7 +31,7 @@
     "graphql": "^14.6.0",
     "graphql-iso-date": "^3.6.1",
     "jsonwebtoken": "^8.5.1",
-    "knex": "^0.20.10",
+    "knex": "^2.4.0",
     "node-cron": "^2.0.3",
     "nodemailer": "^6.4.6",
     "objection": "^2.1.3",
